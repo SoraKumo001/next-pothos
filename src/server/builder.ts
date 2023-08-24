@@ -5,15 +5,17 @@ import PrismaTypes from "./generated/pothos-types";
 import { Prisma } from "@prisma/client";
 import { DateTimeResolver } from "graphql-scalars";
 import {
+  PrismaSchemaGenerator,
   createModelListQuery,
   createModelMutation,
   createModelObject,
   createModelQuery,
+  deleteManyModelMutation,
+  deleteModelMutation,
   updateManyModelMutation,
   updateModelMutation,
 } from "./libs/createPothosSchema";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
-import { PrismaCrudGenerator } from "./libs/generatePothos";
 
 export const builder: PothosSchemaTypes.SchemaBuilder<
   PothosSchemaTypes.ExtendDefaultTypes<{
@@ -43,8 +45,8 @@ export const builder: PothosSchemaTypes.SchemaBuilder<
 
 builder.addScalarType("DateTime", DateTimeResolver, {});
 
-const generator = new PrismaCrudGenerator(builder);
-createModelObject(builder, generator);
+const generator = new PrismaSchemaGenerator(builder);
+createModelObject(generator);
 builder.queryType({
   fields: (t) => {
     return {
@@ -60,6 +62,8 @@ builder.mutationType({
       ...createModelMutation(t, generator),
       ...updateModelMutation(t, generator),
       ...updateManyModelMutation(t, generator),
+      ...deleteModelMutation(t, generator),
+      ...deleteManyModelMutation(t, generator),
     };
   },
 });

@@ -16,6 +16,8 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+/// @pothos-generator {"action":{"include":["create","update"]}}
+/// @pothos-generator {"select":{"exclude":["email"]}}
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -25,6 +27,8 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
+/// @pothos-generator {"action":{"exclude":["deleteMany"]}}
+/// @pothos-generator {"query":{"where":{"published":true},"orderBy":{"title":"desc"}}}
 model Post {
   id          String     @id @default(uuid())
   published   Boolean    @default(false)
@@ -38,6 +42,7 @@ model Post {
   publishedAt DateTime   @default(now())
 }
 
+/// @pothos-generator {"query":{"orderBy":{"name":"asc"}}}
 model Category {
   id        String   @id @default(uuid())
   name      String

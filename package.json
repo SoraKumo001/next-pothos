@@ -11,7 +11,7 @@
   "license": "MIT",
   "description": "",
   "scripts": {
-    "dev": "next",
+    "dev": "prisma generate && next",
     "dev:docker": "docker compose -p next-nexus -f docker/development/docker-compose.yml up -d",
     "build": "next build",
     "start": "next start",
@@ -19,7 +19,8 @@
     "prisma:generate": "prisma generate",
     "graphql:codegen": "graphql-codegen --config codegen/codegen.ts",
     "test": "jest --coverage",
-    "test:watch": "jest --watch --coverage"
+    "test:watch": "jest --watch --coverage",
+    "seed": "ts-node  -r tsconfig-paths/register -T -O \"{\\\"module\\\":\\\"CommonJS\\\"}\" seed"
   },
   "dependencies": {
     "@apollo/server": "^4.9.1",
@@ -74,5 +75,7 @@
       "./src/main.ts",
       "./src/generated"
     ]
-  }
+  },
+  "main": "index.js",
+  "repository": "https://github.com/SoraKumo001/next-pothos"
 }

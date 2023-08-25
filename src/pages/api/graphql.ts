@@ -3,7 +3,7 @@ import { executeHTTPGraphQLRequest } from "@react-libraries/next-apollo-server";
 import { Context, prisma } from "../../server/context";
 import type { NextApiHandler } from "next";
 import { schema } from "../../server";
-
+import jsonwebtoken from "jsonwebtoken";
 /**
  * apolloServer
  */
@@ -26,7 +26,19 @@ const handler: NextApiHandler = async (req, res) => {
     res,
     apolloServer: await apolloServer,
     context: async () => {
-      return { req, res, prisma };
+      const token = req.cookies.session;
+      const user =
+        token &&
+        (await new Promise<string | undefined>((resolve) => {
+          jsonwebtoken.verify(token, "test", (_, data) => {
+            resolve(
+              typeof data === "object"
+                ? (data?.payload?.user as string | undefined)
+                : undefined
+            );
+          });
+        }));
+      return { req, res, prisma, user };
     },
   });
 };

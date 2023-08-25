@@ -11,10 +11,10 @@ export default interface PrismaTypes {
         Where: Prisma.UserWhereInput;
         Create: {};
         Update: {};
-        RelationName: "post";
-        ListRelations: "post";
+        RelationName: "posts";
+        ListRelations: "posts";
         Relations: {
-            post: {
+            posts: {
                 Shape: Post[];
                 Name: "Post";
             };

@@ -7,6 +7,7 @@ export type Context = {
   res: NextApiResponse;
   req: NextApiRequest;
   prisma: PrismaClient;
+  user?: string;
 };
 
 global.prisma?.$disconnect();

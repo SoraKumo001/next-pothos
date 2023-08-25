@@ -1,73 +1,6 @@
 import { Prisma } from "@prisma/client";
 import type { SchemaTypes } from "@pothos/core";
-import { PrismaCrudGenerator } from "./generator";
-
-type ModelDirective = {
-  action?: { include?: string[]; exclude?: string[] };
-  select?: { include?: string[]; exclude?: string[] };
-  query?: { orderBy?: object; where?: object };
-};
-
-const actions = [
-  "find",
-  "findMany",
-  "create",
-  "createMany",
-  "update",
-  "updateMany",
-  "delete",
-  "deleteMany",
-];
-
-export class PrismaSchemaGenerator<
-  Types extends SchemaTypes
-> extends PrismaCrudGenerator<Types> {
-  private _builder;
-  modelDirective: { [key: string]: ModelDirective } = {};
-  constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
-    super(builder);
-    this._builder = builder;
-
-    Prisma.dmmf.datamodel.models.map((model) => {
-      const directive = getSchemaDirective(model.documentation);
-      this.modelDirective[model.name] = directive;
-    });
-  }
-  getModelDirective(modelName: string) {
-    return this.modelDirective[modelName];
-  }
-  getModelActions(modelName: string) {
-    const directive = this.getModelDirective(modelName)?.action;
-    if (directive?.include) {
-      return directive.include;
-    }
-    if (directive?.exclude) {
-      return actions.filter((action) => !directive.exclude?.includes(action));
-    }
-    return actions;
-  }
-  getModelQuery(modelName: string) {
-    const directive = this.getModelDirective(modelName)?.query;
-    return { orderBy: directive?.orderBy ?? {}, where: directive?.where ?? {} };
-  }
-  getModelSelect(modelName: string) {
-    const directive = this.getModelDirective(modelName)?.select;
-    if (directive?.include) {
-      return directive.include;
-    }
-    const fields =
-      Prisma.dmmf.datamodel.models
-        .find(({ name }) => name === modelName)
-        ?.fields.map(({ name }) => name) ?? [];
-    if (directive?.exclude) {
-      return fields.filter((action) => !directive.exclude?.includes(action));
-    }
-    return fields;
-  }
-  getBuilder() {
-    return this._builder;
-  }
-}
+import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator";
 
 type LowerFirst<T extends string> = T extends `${infer F}${infer R}`
   ? `${Lowercase<F>}${R}`
@@ -86,23 +19,6 @@ const getPrisma = <T extends SchemaTypes, ParentShape>(
 ): any => {
   const prisma = t.builder.options.prisma.client;
   return typeof prisma === "function" ? prisma(ctx) : prisma;
-};
-
-const getSchemaDirective = (doc?: string) => {
-  const regex = /(?<=@pothos-generator\s).*$/gm;
-  return (
-    doc
-      ?.replace(/\\n/g, "\n")
-      .match(regex)
-      ?.reduce((acc, cur) => {
-        try {
-          const object = JSON.parse(cur);
-          return Object.assign(acc, object);
-        } catch (e) {
-          throw new Error(`Error parsing schema directive: ${cur}`);
-        }
-      }, {}) ?? {}
-  );
 };
 
 export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
@@ -157,9 +73,11 @@ export const createModelQuery = (
     Prisma.dmmf.datamodel.models
       .filter((model) => generator.getModelActions(model.name).includes("find"))
       .map((model) => {
+        const options = generator.getModelOptions(model.name)["find"];
         return [
           `find${model.name}`,
           t.prismaField({
+            ...options,
             type: model.name,
             nullable: true,
             args: {
@@ -193,9 +111,11 @@ export const createModelListQuery = (
         generator.getModelActions(model.name).includes("findMany")
       )
       .map((model) => {
+        const options = generator.getModelOptions(model.name)["findMany"];
         return [
           `findMany${model.name}`,
           t.prismaField({
+            ...options,
             type: [model.name],
             args: generator.findManyArgs(model.name),
             resolve: (query, _root, args, ctx, _info) => {
@@ -225,12 +145,14 @@ export const createModelMutation = (
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
       .filter((model) =>
-        generator.getModelActions(model.name).includes("findMany")
+        generator.getModelActions(model.name).includes("create")
       )
       .map((model) => {
+        const options = generator.getModelOptions(model.name)["create"];
         return [
           `create${model.name}`,
           t.prismaField({
+            ...options,
             type: model.name,
             args: {
               input: t.arg({
@@ -263,9 +185,11 @@ export const updateModelMutation = (
         generator.getModelActions(model.name).includes("update")
       )
       .map((model) => {
+        const options = generator.getModelOptions(model.name)["update"];
         return [
           `update${model.name}`,
           t.prismaField({
+            ...options,
             type: model.name,
             args: {
               where: t.arg({
@@ -305,9 +229,11 @@ export const updateManyModelMutation = (
         generator.getModelActions(model.name).includes("updateMany")
       )
       .map((model) => {
+        const options = generator.getModelOptions(model.name)["updateMany"];
         return [
           `updateMany${model.name}`,
           t.int({
+            ...options,
             args: {
               where: t.arg({
                 type: generator.getWhereUnique(model.name),
@@ -343,9 +269,11 @@ export const deleteModelMutation = (
         generator.getModelActions(model.name).includes("delete")
       )
       .map((model) => {
+        const options = generator.getModelOptions(model.name)["delete"];
         return [
           `delete${model.name}`,
           t.prismaField({
+            ...options,
             type: model.name,
             args: {
               where: t.arg({
@@ -378,9 +306,11 @@ export const deleteManyModelMutation = (
         generator.getModelActions(model.name).includes("deleteMany")
       )
       .map((model) => {
+        const options = generator.getModelOptions(model.name)["deleteMany"];
         return [
           `deleteMany${model.name}`,
           t.int({
+            ...options,
             args: {
               where: t.arg({
                 type: generator.getWhereUnique(model.name),

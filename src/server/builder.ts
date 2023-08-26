@@ -4,22 +4,15 @@ import { Context, prisma } from "./context";
 import PrismaTypes from "./generated/pothos-types";
 import { Prisma } from "@prisma/client";
 import { DateTimeResolver } from "graphql-scalars";
-import {
-  createModelListQuery,
-  createModelMutation,
-  createModelObject,
-  createModelQuery,
-  deleteManyModelMutation,
-  deleteModelMutation,
-  updateManyModelMutation,
-  updateModelMutation,
-} from "./libs/createPothosSchema";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
-import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
+import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
+import PothosPrismaGeneratorPlugin from "pothos-prisma-generator-plugin";
 import jsonwebtoken from "jsonwebtoken";
 import { serialize } from "cookie";
-import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
 
+/**
+ * Create a new schema builder instance
+ */
 export const builder = new SchemaBuilder<{
   Context: Context;
   PrismaTypes: PrismaTypes;
@@ -30,7 +23,12 @@ export const builder = new SchemaBuilder<{
     };
   };
 }>({
-  plugins: [PrismaPlugin, PrismaUtils, ScopeAuthPlugin],
+  plugins: [
+    PrismaPlugin,
+    PrismaUtils,
+    ScopeAuthPlugin,
+    PothosPrismaGeneratorPlugin,
+  ],
   prisma: {
     client: prisma,
     dmmf: Prisma.dmmf,
@@ -40,28 +38,13 @@ export const builder = new SchemaBuilder<{
   }),
 });
 
+// Add custom scalar types
 builder.addScalarType("DateTime", DateTimeResolver, {});
 
-const generator = new PrismaSchemaGenerator(builder);
-createModelObject(generator);
-
-builder.queryType({
-  fields: (t) => {
-    return {
-      ...createModelQuery(t, generator),
-      ...createModelListQuery(t, generator),
-    };
-  },
-});
-
+// Example of how to add a custom auth query
 builder.mutationType({
   fields: (t) => {
     return {
-      ...createModelMutation(t, generator),
-      ...updateModelMutation(t, generator),
-      ...updateManyModelMutation(t, generator),
-      ...deleteModelMutation(t, generator),
-      ...deleteManyModelMutation(t, generator),
       signIn: t.boolean({
         args: { user: t.arg({ type: "String", required: true }) },
         resolve: (_root, args, ctx, _info) => {

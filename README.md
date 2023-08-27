@@ -75,9 +75,10 @@ builder.addScalarType("DateTime", DateTimeResolver, {});
 開発中で仕様が変更される可能性が大きいので詳細は省きます。
 
 - query/mutation の自動出力設定  
-  `find`,`findMany`,`create`,`update`,`updateMany`,`delete`,`deleteMany`
+  `find`,`findMany`,`create`,`createMany`,`update`,`updateMany`,`delete`,`deleteMany`
 - query 時の`orderBy`,`where`の挿入
-- フィールドオプションの追加による、認証機能の設定
+- オプションの追加による、認証機能の設定
+- データ操作時の対象フィールドの制限
 
 ```prisma
 // This is your Prisma schema file,

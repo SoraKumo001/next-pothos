@@ -30,7 +30,6 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
         const fields = model.fields
           .filter(({ name }) => selectFields.has(name))
           .map((field) => {
-            const modelQuery = generator.getModelQuery(field.type);
             return [
               field.name,
               field.isId
@@ -40,23 +39,36 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     type: field.isList ? t.listRef(field.type) : field.type,
                     nullable: !field.isRequired,
                   })
-                : t.relation(field.name, {
-                    args: generator.findManyArgs(field.type),
-                    query: (args) => {
-                      const where = { ...args.filter, ...modelQuery.where };
-                      const orderBy = {
-                        ...args.orderBy,
-                        ...modelQuery.orderBy,
-                      };
+                : (() => {
+                    const operationPrefix = field.isList ? "findMany" : "find";
+                    const modelQuery = generator.getModelQuery(field.type)[
+                      operationPrefix
+                    ];
+                    const options = generator.getModelOptions(field.type)[
+                      operationPrefix
+                    ];
+                    return t.relation(field.name, {
+                      ...options,
+                      args: field.isList
+                        ? generator.findManyArgs(field.type)
+                        : undefined,
+                      query: (args) => {
+                        if (!field.isList) return {};
 
-                      return {
-                        where: Object.keys(where).length ? where : undefined,
-                        orderBy: Object.keys(orderBy).length
-                          ? orderBy
-                          : undefined,
-                      };
-                    },
-                  }),
+                        const where = { ...args.filter, ...modelQuery.where };
+                        const orderBy = {
+                          ...modelQuery.orderBy,
+                          ...args.orderBy,
+                        };
+                        return {
+                          where: Object.keys(where).length ? where : undefined,
+                          orderBy: Object.keys(orderBy).length
+                            ? orderBy
+                            : undefined,
+                        };
+                      },
+                    });
+                  })(),
             ];
           });
         return Object.fromEntries(fields);
@@ -69,13 +81,16 @@ export const createModelQuery = (
   t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
+  const operationPrefix = "find";
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
-      .filter((model) => generator.getModelActions(model.name).includes("find"))
+      .filter((model) =>
+        generator.getModelOperations(model.name).includes(operationPrefix)
+      )
       .map((model) => {
-        const options = generator.getModelOptions(model.name)["find"];
+        const options = generator.getModelOptions(model.name)[operationPrefix];
         return [
-          `find${model.name}`,
+          `${operationPrefix}${model.name}`,
           t.prismaField({
             ...options,
             type: model.name,
@@ -88,7 +103,9 @@ export const createModelQuery = (
             },
             resolve: (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
-              const modelQuery = generator.getModelQuery(model.name);
+              const modelQuery = generator.getModelQuery(model.name)[
+                operationPrefix
+              ];
               const where = { ...args.filter, ...modelQuery.where };
               return prisma[lowerFirst(model.name)].findUnique({
                 ...query,
@@ -105,22 +122,25 @@ export const createModelListQuery = (
   t: PothosSchemaTypes.QueryFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
+  const operationPrefix = "findMany";
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
       .filter((model) =>
-        generator.getModelActions(model.name).includes("findMany")
+        generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map((model) => {
-        const options = generator.getModelOptions(model.name)["findMany"];
+        const options = generator.getModelOptions(model.name)[operationPrefix];
         return [
-          `findMany${model.name}`,
+          `${operationPrefix}${model.name}`,
           t.prismaField({
             ...options,
             type: [model.name],
             args: generator.findManyArgs(model.name),
             resolve: (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
-              const modelQuery = generator.getModelQuery(model.name);
+              const modelQuery = generator.getModelQuery(model.name)[
+                operationPrefix
+              ];
               const where = { ...args.filter, ...modelQuery.where };
               const orderBy = {
                 ...args.orderBy,
@@ -142,27 +162,31 @@ export const createModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
+  const operationPrefix = "create";
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
-      .filter((model) =>
-        generator.getModelActions(model.name).includes("create")
+      .filter(({ name }) =>
+        generator.getModelOperations(name).includes(operationPrefix)
       )
-      .map((model) => {
-        const options = generator.getModelOptions(model.name)["create"];
+      .map(({ name }) => {
+        const options = generator.getModelOptions(name)[operationPrefix];
         return [
-          `create${model.name}`,
+          `${operationPrefix}${name}`,
           t.prismaField({
             ...options,
-            type: model.name,
+            type: name,
             args: {
               input: t.arg({
-                type: generator.getCreateInput(model.name),
+                type: generator.getCreateInput(
+                  name,
+                  generator.getModelInputFields(name)
+                ),
                 required: true,
               }),
             },
             resolve: (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
-              return prisma[lowerFirst(model.name)].create({
+              return prisma[lowerFirst(name)].create({
                 ...query,
                 data: {
                   ...args.input,
@@ -175,35 +199,82 @@ export const createModelMutation = (
   );
 };
 
+export const createManyMutation = (
+  t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
+  generator: PrismaSchemaGenerator<any>
+) => {
+  const operationPrefix = "createMany";
+  return Object.fromEntries(
+    Prisma.dmmf.datamodel.models
+      .filter(({ name }) =>
+        generator.getModelOperations(name).includes(operationPrefix)
+      )
+      .map(({ name }) => {
+        const options = generator.getModelOptions(name)[operationPrefix];
+        return [
+          `${operationPrefix}${name}`,
+          t.int({
+            ...options,
+            args: {
+              input: t.arg({
+                type: [
+                  generator.getCreateInput(
+                    name,
+                    generator.getModelInputFields(name)
+                  ),
+                ],
+                required: true,
+              }),
+            },
+            resolve: (_root, args, ctx, _info) => {
+              const prisma = getPrisma(t, ctx);
+              return prisma[lowerFirst(name)]
+                .createMany({
+                  data: {
+                    ...args.input,
+                  },
+                })
+                .then(({ count }: { count: number }) => count);
+            },
+          }),
+        ];
+      })
+  );
+};
+
 export const updateModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
+  const operationPrefix = "update";
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
       .filter((model) =>
-        generator.getModelActions(model.name).includes("update")
+        generator.getModelOperations(model.name).includes(operationPrefix)
       )
-      .map((model) => {
-        const options = generator.getModelOptions(model.name)["update"];
+      .map(({ name }) => {
+        const options = generator.getModelOptions(name)[operationPrefix];
         return [
-          `update${model.name}`,
+          `${operationPrefix}${name}`,
           t.prismaField({
             ...options,
-            type: model.name,
+            type: name,
             args: {
               where: t.arg({
-                type: generator.getWhereUnique(model.name),
+                type: generator.getWhereUnique(name),
                 required: true,
               }),
               data: t.arg({
-                type: generator.getUpdateInput(model.name),
+                type: generator.getUpdateInput(
+                  name,
+                  generator.getModelInputFields(name)
+                ),
                 required: true,
               }),
             },
             resolve: (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
-              return prisma[lowerFirst(model.name)].update({
+              return prisma[lowerFirst(name)].update({
                 ...query,
                 where: {
                   ...args.where,
@@ -223,30 +294,34 @@ export const updateManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
+  const operationPrefix = "update";
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
       .filter((model) =>
-        generator.getModelActions(model.name).includes("updateMany")
+        generator.getModelOperations(model.name).includes(operationPrefix)
       )
-      .map((model) => {
-        const options = generator.getModelOptions(model.name)["updateMany"];
+      .map(({ name }) => {
+        const options = generator.getModelOptions(name)[operationPrefix];
         return [
-          `updateMany${model.name}`,
+          `${operationPrefix}${name}`,
           t.int({
             ...options,
             args: {
               where: t.arg({
-                type: generator.getWhereUnique(model.name),
+                type: generator.getWhere(name),
                 required: true,
               }),
               data: t.arg({
-                type: generator.getUpdateInput(model.name),
+                type: generator.getUpdateInput(
+                  name,
+                  generator.getModelInputFields(name)
+                ),
                 required: true,
               }),
             },
             resolve: (_parent, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
-              return prisma[lowerFirst(model.name)]
+              return prisma[lowerFirst(name)]
                 .updateMany({
                   where: args.where ?? undefined,
                   data: args.data,
@@ -263,15 +338,16 @@ export const deleteModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
+  const operationPrefix = "delete";
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
       .filter((model) =>
-        generator.getModelActions(model.name).includes("delete")
+        generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map((model) => {
-        const options = generator.getModelOptions(model.name)["delete"];
+        const options = generator.getModelOptions(model.name)[operationPrefix];
         return [
-          `delete${model.name}`,
+          `${operationPrefix}${model.name}`,
           t.prismaField({
             ...options,
             type: model.name,
@@ -300,20 +376,21 @@ export const deleteManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
+  const operationPrefix = "deleteMany";
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
       .filter((model) =>
-        generator.getModelActions(model.name).includes("deleteMany")
+        generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map((model) => {
-        const options = generator.getModelOptions(model.name)["deleteMany"];
+        const options = generator.getModelOptions(model.name)[operationPrefix];
         return [
-          `deleteMany${model.name}`,
+          `${operationPrefix}${model.name}`,
           t.int({
             ...options,
             args: {
               where: t.arg({
-                type: generator.getWhereUnique(model.name),
+                type: generator.getWhere(model.name),
                 required: true,
               }),
             },

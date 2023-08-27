@@ -4,6 +4,7 @@ import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
 import {
   createModelListQuery,
   createModelMutation,
+  createManyMutation,
   createModelObject,
   createModelQuery,
   deleteManyModelMutation,
@@ -20,38 +21,27 @@ export class PothosPrismaGeneratorPlugin<
     const generator = new PrismaSchemaGenerator(builder);
     createModelObject(generator);
 
-    try {
-      builder.queryType({
-        fields: (t) => ({
-          ...createModelQuery(t, generator),
-          ...createModelListQuery(t, generator),
-        }),
-      });
-    } catch (e) {
-      builder.queryFields((t) => ({
-        ...createModelQuery(t, generator),
-        ...createModelListQuery(t, generator),
-      }));
+    if (!builder.configStore.typeConfigs.has("Query")) {
+      builder.queryType({});
     }
-    try {
-      builder.mutationType({
-        fields: (t) => ({
-          ...createModelMutation(t, generator),
-          ...updateModelMutation(t, generator),
-          ...updateManyModelMutation(t, generator),
-          ...deleteModelMutation(t, generator),
-          ...deleteManyModelMutation(t, generator),
-        }),
-      });
-    } catch (e) {
-      builder.mutationFields((t) => ({
-        ...createModelMutation(t, generator),
-        ...updateModelMutation(t, generator),
-        ...updateManyModelMutation(t, generator),
-        ...deleteModelMutation(t, generator),
-        ...deleteManyModelMutation(t, generator),
-      }));
+
+    builder.queryFields((t) => ({
+      ...createModelQuery(t, generator),
+      ...createModelListQuery(t, generator),
+    }));
+
+    if (!builder.configStore.typeConfigs.has("Mutation")) {
+      builder.mutationType({});
     }
+
+    builder.mutationFields((t) => ({
+      ...createModelMutation(t, generator),
+      ...createManyMutation(t, generator),
+      ...updateModelMutation(t, generator),
+      ...updateManyModelMutation(t, generator),
+      ...deleteModelMutation(t, generator),
+      ...deleteManyModelMutation(t, generator),
+    }));
   }
 }
 

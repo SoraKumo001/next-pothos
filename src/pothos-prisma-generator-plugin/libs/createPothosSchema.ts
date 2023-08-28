@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 import type { SchemaTypes } from "@pothos/core";
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator";
+import traverse from "traverse";
 
 type LowerFirst<T extends string> = T extends `${infer F}${infer R}`
   ? `${Lowercase<F>}${R}`
@@ -170,6 +171,7 @@ export const createModelMutation = (
       )
       .map(({ name }) => {
         const options = generator.getModelOptions(name)[operationPrefix];
+        const modelInput = generator.getModelInputData(name);
         return [
           `${operationPrefix}${name}`,
           t.prismaField({
@@ -177,20 +179,18 @@ export const createModelMutation = (
             type: name,
             args: {
               input: t.arg({
-                type: generator.getCreateInput(
-                  name,
-                  generator.getModelInputFields(name)
-                ),
+                type: generator.getCreateInput(name),
                 required: true,
               }),
             },
-            resolve: (query, _root, args, ctx, _info) => {
+            resolve: async (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
+              const input = await t.builder.replaceValue(modelInput, {
+                context: ctx,
+              });
               return prisma[lowerFirst(name)].create({
                 ...query,
-                data: {
-                  ...args.input,
-                },
+                data: { ...args.input, ...input },
               });
             },
           }),
@@ -199,7 +199,7 @@ export const createModelMutation = (
   );
 };
 
-export const createManyMutation = (
+export const createManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
@@ -217,12 +217,7 @@ export const createManyMutation = (
             ...options,
             args: {
               input: t.arg({
-                type: [
-                  generator.getCreateInput(
-                    name,
-                    generator.getModelInputFields(name)
-                  ),
-                ],
+                type: [generator.getCreateInput(name)],
                 required: true,
               }),
             },
@@ -265,10 +260,7 @@ export const updateModelMutation = (
                 required: true,
               }),
               data: t.arg({
-                type: generator.getUpdateInput(
-                  name,
-                  generator.getModelInputFields(name)
-                ),
+                type: generator.getUpdateInput(name),
                 required: true,
               }),
             },
@@ -294,7 +286,7 @@ export const updateManyModelMutation = (
   t: PothosSchemaTypes.MutationFieldBuilder<any, any>,
   generator: PrismaSchemaGenerator<any>
 ) => {
-  const operationPrefix = "update";
+  const operationPrefix = "updateMany";
   return Object.fromEntries(
     Prisma.dmmf.datamodel.models
       .filter((model) =>

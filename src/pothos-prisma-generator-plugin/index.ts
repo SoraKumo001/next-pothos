@@ -4,7 +4,7 @@ import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
 import {
   createModelListQuery,
   createModelMutation,
-  createManyMutation,
+  createManyModelMutation,
   createModelObject,
   createModelQuery,
   deleteManyModelMutation,
@@ -12,6 +12,25 @@ import {
   updateManyModelMutation,
   updateModelMutation,
 } from "./libs/createPothosSchema";
+import traverse from "traverse";
+
+SchemaBuilder.prototype.addReplaceValue = function (
+  search: string,
+  replaceFunction: (props: { context: any }) => object
+) {
+  if (!this.replaceValues) this.replaceValues = {};
+  this.replaceValues[search] = replaceFunction;
+};
+SchemaBuilder.prototype.replaceValue = function (
+  target: object,
+  props: { context: any }
+) {
+  const builder = this;
+  return traverse(target).forEach(async function (value) {
+    const func = builder.replaceValues?.[value];
+    if (func) this.update(await func(props));
+  });
+};
 
 export class PothosPrismaGeneratorPlugin<
   Types extends SchemaTypes
@@ -36,7 +55,7 @@ export class PothosPrismaGeneratorPlugin<
 
     builder.mutationFields((t) => ({
       ...createModelMutation(t, generator),
-      ...createManyMutation(t, generator),
+      ...createManyModelMutation(t, generator),
       ...updateModelMutation(t, generator),
       ...updateManyModelMutation(t, generator),
       ...deleteModelMutation(t, generator),

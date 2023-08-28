@@ -99,8 +99,9 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// @pothos-generator action {"include":["create","update"]}
-/// @pothos-generator select {"exclude":["email"]}
+/// @pothos-generator operation {include:["create","update"]}
+/// @pothos-generator select {exclude:["email"]}
+/// @pothos-generator input {fields:{exclude:["id","createdAt","updatedAt"]}}
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -110,9 +111,10 @@ model User {
   updatedAt DateTime @updatedAt
 }
 
-/// @pothos-generator action {"exclude":["deleteMany"]}
-/// @pothos-generator query {"where":{"published":true},"orderBy":{"title":"desc"}}
-/// @pothos-generator option {"include":["mutation"],"params":{"authScopes":{"authenticated":true}}}
+/// @pothos-generator operation {exclude:["deleteMany"]}
+/// @pothos-generator query {include:["query"],where:{published:true},orderBy:{title:"desc"}}
+/// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
+/// @pothos-generator input {fields:{exclude:["id","createdAt","updatedAt"]},data:{author:{connect:{id:"%%USER%%"}}}}
 model Post {
   id          String     @id @default(uuid())
   published   Boolean    @default(false)
@@ -126,7 +128,7 @@ model Post {
   publishedAt DateTime   @default(now())
 }
 
-/// @pothos-generator query {"orderBy":{"name":"asc"}}
+/// @pothos-generator query {orderBy:{name:"desc"}}
 model Category {
   id        String   @id @default(uuid())
   name      String
@@ -134,4 +136,15 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+```
+
+### 入力データの置換
+
+builder に対して置換文字列を設定しておくと、input-data に設定した文字列をにクエリ実行時に置き換えます。
+ログインユーザの情報を書き込む場合などに利用できます。
+
+```ts
+// 以下のディレクティブを置き換える
+// /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
+builder.addReplaceValue("%%USER%%", async ({ context }) => context.user?.id);
 ```

@@ -304,7 +304,6 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
             const relatedFieldName = relatedModel.fields.find(
               (field) => field.relationName === relationField.relationName
             )!;
-
             return {
               create: this.getCreateInput(relationField.type as Name, [
                 relatedFieldName.name,

@@ -28,7 +28,7 @@ type ModelDirective = {
     where?: object;
   };
   option?: { include?: Operation[]; exclude?: Operation[]; option?: object };
-  input?: { fields: { include?: string[]; exclude?: string[] } };
+  input?: { fields: { include?: string[]; exclude?: string[] }; data?: object };
 };
 
 const getSchemaDirectives = (doc?: string) => {
@@ -93,8 +93,11 @@ export class PrismaSchemaGenerator<
       [key in Operation]: { orderBy?: object; where?: object };
     };
   } = {};
-  modelInputFields: {
+  modelInputWithoutFields: {
     [key: string]: string[];
+  } = {};
+  modelInputData: {
+    [key: string]: object;
   } = {};
 
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
@@ -185,11 +188,12 @@ export class PrismaSchemaGenerator<
   protected createModelInput() {
     Prisma.dmmf.datamodel.models.forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "input");
-      this.modelInputFields[name] = this.getModelFields(
+      this.modelInputWithoutFields[name] = this.getModelFields(
         name,
         directives[0]?.fields,
         true
       );
+      this.modelInputData[name] = directives[0]?.data ?? {};
     });
   }
 
@@ -234,6 +238,23 @@ export class PrismaSchemaGenerator<
     return this.modelQuery[modelName] ?? {};
   }
   getModelInputFields(modelName: string) {
-    return this.modelInputFields[modelName] ?? [];
+    return this.modelInputWithoutFields[modelName] ?? [];
+  }
+  getModelInputData(modelName: string) {
+    return this.modelInputData[modelName] ?? [];
+  }
+  getCreateInput<Name extends keyof Types["PrismaTypes"] & string>(
+    modelName: Name,
+    without?: string[]
+  ) {
+    const fields = this.getModelInputFields(modelName);
+    return super.getCreateInput(modelName, [...fields, ...(without ?? [])]);
+  }
+  getUpdateInput<Name extends keyof Types["PrismaTypes"] & string>(
+    modelName: Name,
+    without?: string[]
+  ) {
+    const fields = this.getModelInputFields(modelName);
+    return super.getUpdateInput(modelName, [...fields, ...(without ?? [])]);
   }
 }

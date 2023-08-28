@@ -483,18 +483,18 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
     );
   }
 
-  private getEnum(name: string) {
+  getEnum(name: string) {
     if (!this.enumRefs.has(name)) {
-      const enumRef = this.builder.enumType(
-        (Prisma as unknown as Record<string, BaseEnum>)[name],
-        {
-          name,
-        }
+      const modelEnum = Prisma.dmmf.datamodel.enums.find(
+        (modelEnum) => modelEnum.name === name
       );
-
-      this.enumRefs.set(name, enumRef);
+      if (modelEnum) {
+        const enumRef = this.builder.enumType(modelEnum.name, {
+          values: modelEnum.values.map(({ name }) => name),
+        });
+        this.enumRefs.set(name, enumRef);
+      }
     }
-
     return this.enumRefs.get(name)!;
   }
 

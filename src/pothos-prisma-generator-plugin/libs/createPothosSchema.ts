@@ -41,6 +41,11 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     type: field.isList ? t.listRef(field.type) : field.type,
                     nullable: !field.isRequired,
                   })
+                : field.kind === "enum"
+                ? t.expose(field.name, {
+                    type: generator.getEnum(field.type)!,
+                    nullable: !field.isRequired,
+                  })
                 : (() => {
                     const operationPrefix = field.isList
                       ? "findMany"

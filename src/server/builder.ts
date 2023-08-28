@@ -3,7 +3,7 @@ import PrismaPlugin from "@pothos/plugin-prisma";
 import { Context, prisma } from "./context";
 import PrismaTypes from "./generated/pothos-types";
 import { Prisma } from "@prisma/client";
-import { DateTimeResolver } from "graphql-scalars";
+import { ByteResolver, DateTimeResolver, JSONResolver } from "graphql-scalars";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
 import PothosPrismaGeneratorPlugin from "pothos-prisma-generator-plugin";
@@ -20,6 +20,14 @@ export const builder = new SchemaBuilder<{
     DateTime: {
       Input: Date;
       Output: Date;
+    };
+    Json: {
+      Input: any;
+      Output: any;
+    };
+    Byte: {
+      Input: Buffer;
+      Output: Buffer;
     };
   };
 }>({
@@ -40,6 +48,8 @@ export const builder = new SchemaBuilder<{
 
 // Add custom scalar types
 builder.addScalarType("DateTime", DateTimeResolver, {});
+builder.addScalarType("Json", JSONResolver, {});
+builder.addScalarType("Byte", ByteResolver, {});
 
 // Example of how to add a custom auth query
 builder.mutationType({

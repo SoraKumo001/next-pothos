@@ -78,7 +78,9 @@ builder.addScalarType("DateTime", DateTimeResolver, {});
   `find`,`findMany`,`create`,`createMany`,`update`,`updateMany`,`delete`,`deleteMany`
 - query 時の`orderBy`,`where`の挿入
 - オプションの追加による、認証機能の設定
-- データ操作時の対象フィールドの制限
+- create や update 時に input 可能なフィールドの制限
+- create や update 時に強制入力する data の設定
+- create や update 時、prisma に送る where を context の情報を参照して実行時に生成する機能
 
 ```prisma
 // This is your Prisma schema file,
@@ -99,9 +101,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// @pothos-generator operation {include:["create","update"]}
-/// @pothos-generator select {exclude:["email"]}
-/// @pothos-generator input {fields:{exclude:["id","createdAt","updatedAt"]}}
+/// @pothos-generator operation {include:["createOne","updateOne","findMany"]}
+/// @pothos-generator select {fields:{exclude:["email"]}}
+/// @pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}
+/// @pothos-generator input-field {include:["update"],fields:{include:["name"]}}
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -112,9 +115,12 @@ model User {
 }
 
 /// @pothos-generator operation {exclude:["deleteMany"]}
-/// @pothos-generator query {include:["query"],where:{published:true},orderBy:{title:"desc"}}
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
-/// @pothos-generator input {fields:{exclude:["id","createdAt","updatedAt"]},data:{author:{connect:{id:"%%USER%%"}}}}
+/// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}
+/// @pothos-generator input-data {data:{author:{connect:{id:"%%USER%%"}}}}
+/// @pothos-generator where {include:["query"],where:{published:true}}
+/// @pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}
+/// @pothos-generator order {orderBy:{title:"desc"}}
 model Post {
   id          String     @id @default(uuid())
   published   Boolean    @default(false)
@@ -128,7 +134,8 @@ model Post {
   publishedAt DateTime   @default(now())
 }
 
-/// @pothos-generator query {orderBy:{name:"desc"}}
+/// @pothos-generator order {orderBy:{name:"asc"}}
+/// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","posts"]}}
 model Category {
   id        String   @id @default(uuid())
   name      String
@@ -136,11 +143,12 @@ model Category {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
+
 ```
 
 ### 入力データの置換
 
-builder に対して置換文字列を設定しておくと、input-data に設定した文字列をにクエリ実行時に置き換えます。
+builder に対して置換文字列を設定しておくと、input-data と where ディレクティブ 内の文字列をクエリ実行時に置き換えます。
 ログインユーザの情報を書き込む場合などに利用できます。
 
 ```ts

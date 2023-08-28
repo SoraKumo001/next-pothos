@@ -16,9 +16,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// @pothos-generator operation {include:["create","update"]}
-/// @pothos-generator select {exclude:["email"]}
-/// @pothos-generator input {fields:{exclude:["id","createdAt","updatedAt"]}}
+/// @pothos-generator operation {include:["createOne","updateOne","findMany"]}
+/// @pothos-generator select {fields:{exclude:["email"]}}
+/// @pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}
+/// @pothos-generator input-field {include:["update"],fields:{include:["name"]}}
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
@@ -29,9 +30,12 @@ model User {
 }
 
 /// @pothos-generator operation {exclude:["deleteMany"]}
-/// @pothos-generator query {include:["query"],where:{published:true},orderBy:{title:"desc"}}
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
-/// @pothos-generator input {fields:{exclude:["id","createdAt","updatedAt"]},data:{author:{connect:{id:"%%USER%%"}}}}
+/// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}
+/// @pothos-generator input-data {data:{author:{connect:{id:"%%USER%%"}}}}
+/// @pothos-generator where {include:["query"],where:{published:true}}
+/// @pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}
+/// @pothos-generator order {orderBy:{title:"desc"}}
 model Post {
   id          String     @id @default(uuid())
   published   Boolean    @default(false)
@@ -45,7 +49,8 @@ model Post {
   publishedAt DateTime   @default(now())
 }
 
-/// @pothos-generator query {orderBy:{name:"desc"}}
+/// @pothos-generator order {orderBy:{name:"asc"}}
+/// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","posts"]}}
 model Category {
   id        String   @id @default(uuid())
   name      String

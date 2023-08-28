@@ -21,14 +21,35 @@ SchemaBuilder.prototype.addReplaceValue = function (
   if (!this.replaceValues) this.replaceValues = {};
   this.replaceValues[search] = replaceFunction;
 };
-SchemaBuilder.prototype.replaceValue = function (
+SchemaBuilder.prototype.replaceValue = async function (
   target: object,
   props: { context: any }
 ) {
   const builder = this;
-  return traverse(target).forEach(async function (value) {
+  const replaces: {
+    [key: string]: (props: { context: any }) => Promise<object>;
+  } = {};
+  const src = { ...target };
+  traverse(src).forEach(function (value) {
+    console.log(value);
     const func = builder.replaceValues?.[value];
-    if (func) this.update(await func(props));
+    if (func) {
+      replaces[value] = func;
+    }
+  });
+  const replaceValues = Object.fromEntries(
+    await Promise.all(
+      Object.entries(replaces).map(async ([key, func]) => [
+        key,
+        await func(props),
+      ])
+    )
+  );
+  return traverse(src).forEach(function (value) {
+    const v = replaceValues[value];
+    if (v) {
+      this.update(v);
+    }
   });
 };
 

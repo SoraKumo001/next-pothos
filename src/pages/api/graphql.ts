@@ -27,17 +27,21 @@ const handler: NextApiHandler = async (req, res) => {
     apolloServer: await apolloServer,
     context: async () => {
       const token = req.cookies.session;
-      const user =
-        token &&
-        (await new Promise<string | undefined>((resolve) => {
-          jsonwebtoken.verify(token, "test", (_, data) => {
-            resolve(
-              typeof data === "object"
-                ? (data?.payload?.user as string | undefined)
-                : undefined
-            );
-          });
-        }));
+      const user = token
+        ? await new Promise<{ id: string; name: string } | undefined>(
+            (resolve) => {
+              jsonwebtoken.verify(token, "test", (_, data) => {
+                resolve(
+                  typeof data === "object"
+                    ? (data?.payload?.user as
+                        | { id: string; name: string }
+                        | undefined)
+                    : undefined
+                );
+              });
+            }
+          )
+        : undefined;
       return { req, res, prisma, user };
     },
   });

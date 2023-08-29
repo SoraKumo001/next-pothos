@@ -7,7 +7,8 @@ declare global {
       pothosPrismaGenerator: PothosPrismaGeneratorPlugin<Types>;
     }
     export interface SchemaBuilder<Types extends SchemaTypes> {
-      replaceValues: { [key: string]: (props: { context: any }) => object };
+      replaceValues?: { [key: string]: (props: { context: any }) => object };
+      authorityFunc?: (ctx: Types["Context"]) => string[];
       addReplaceValue: (
         search: string,
         replaceFunction: (props: {
@@ -18,6 +19,8 @@ declare global {
         target: object,
         props: { context: any }
       ) => Promise<object>;
+      setAuthority: (func: (ctx: Types["Context"]) => string[]) => void;
+      getAuthority: (ctx: Types["Context"]) => string[];
     }
   }
 }

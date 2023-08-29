@@ -5,16 +5,19 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator pothos {
-  provider     = "prisma-pothos-types"
-  clientOutput = "@prisma/client"
-  output       = "../src/server/generated/pothos-types.ts"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Unnecessary because automatic generation does not refer to type information
+
+// generator pothos {
+//   provider     = "prisma-pothos-types"
+//   clientOutput = "@prisma/client"
+//   output       = "../src/server/generated/pothos-types.ts"
+// }
+
 
 /// @pothos-generator operation {include:["createOne","updateOne","findMany"]}
 /// @pothos-generator select {fields:{exclude:["email"]}}
@@ -33,6 +36,7 @@ model User {
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
 /// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}
 /// @pothos-generator input-data {data:{author:{connect:{id:"%%USER%%"}}}}
+/// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
 /// @pothos-generator where {include:["query"],where:{published:true}}
 /// @pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}
 /// @pothos-generator order {orderBy:{title:"desc"}}

@@ -2,6 +2,7 @@ import { Prisma } from "@prisma/client";
 import type { SchemaTypes } from "@pothos/core";
 import { PrismaCrudGenerator } from "./PrismaCrudGenerator";
 import JSON5 from "json5";
+import { Optional } from "@prisma/client/runtime/library";
 
 const findOperations = ["findFirst", "findMany"] as const;
 const createOperations = ["createOne", "createMany"] as const;
@@ -43,6 +44,7 @@ type ModelDirective = {
     include?: Operation[];
     exclude?: Operation[];
     where?: object;
+    authority?: string[];
   };
   option?: { include?: Operation[]; exclude?: Operation[]; option?: object };
   "input-field"?: {
@@ -104,6 +106,24 @@ const getOperations = ({
   return allOperations;
 };
 
+type ModelWhere = {
+  [key: string]: {
+    [key in Operation]: [string[], object][];
+  };
+};
+
+type ModelOrder = {
+  [key: string]: {
+    [key in Operation]: object;
+  };
+};
+
+type ModelInputWithoutFields = {
+  [key: string]: { [key in Operation]: string[] };
+};
+type ModelInputData = {
+  [key: string]: { [key in Operation]: object };
+};
 export class PrismaSchemaGenerator<
   Types extends SchemaTypes
 > extends PrismaCrudGenerator<Types> {
@@ -117,22 +137,10 @@ export class PrismaSchemaGenerator<
     [key: string]: { [key in Operation]: object | undefined };
   } = {};
   modelSelections: { [key: string]: { [key in Operation]: string[] } } = {};
-  modelWhere: {
-    [key: string]: {
-      [key in Operation]: object;
-    };
-  } = {};
-  modelOrder: {
-    [key: string]: {
-      [key in Operation]: object;
-    };
-  } = {};
-  modelInputWithoutFields: {
-    [key: string]: { [key in Operation]: string[] };
-  } = {};
-  modelInputData: {
-    [key: string]: { [key in Operation]: object };
-  } = {};
+  modelWhere: ModelWhere = {};
+  modelOrder: ModelOrder = {};
+  modelInputWithoutFields: ModelInputWithoutFields = {};
+  modelInputData: ModelInputData = {};
 
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
     super(builder);
@@ -234,19 +242,16 @@ export class PrismaSchemaGenerator<
   protected createModelWhere() {
     Prisma.dmmf.datamodel.models.forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "where");
-
-      directives.forEach((query) => {
-        const operations = getOperations(query ?? {});
-        let result = {};
-        operations.forEach((action) => {
-          result = {
+      directives.forEach((directive) => {
+        const operations = getOperations(directive ?? {});
+        const { authority = [], where } = directive ?? {};
+        this.modelWhere[name] = operations.reduce(
+          (result, operation) => ({
             ...result,
-            [action]: query?.where,
-          };
-        });
-        this.modelWhere[name] = result as {
-          [key in Operation]: object;
-        };
+            [operation]: [...(result[operation] ?? []), [authority, where]],
+          }),
+          this.modelWhere[name] ?? {}
+        );
       });
     });
   }
@@ -334,8 +339,19 @@ export class PrismaSchemaGenerator<
     return this.modelSelections[modelName] ?? [];
   }
 
-  getModelWhere(modelName: string) {
-    return this.modelWhere[modelName] ?? {};
+  getModelWhere(
+    modelName: string,
+    operationPrefix: Operation,
+    ctx: SchemaTypes["Context"]
+  ) {
+    const values = this.modelWhere[modelName][operationPrefix];
+    const authority = this.getBuilder().getAuthority(ctx);
+    console.log(authority);
+    const whereModel = values.find(
+      (value) =>
+        value[0].length === 0 || value[0].some((v) => authority.includes(v))
+    );
+    return whereModel?.[1] ?? [];
   }
   getModelOrder(modelName: string) {
     return this.modelOrder[modelName] ?? {};

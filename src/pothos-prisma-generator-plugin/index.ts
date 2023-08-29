@@ -31,7 +31,6 @@ SchemaBuilder.prototype.replaceValue = async function (
   } = {};
   const src = { ...target };
   traverse(src).forEach(function (value) {
-    console.log(value);
     const func = builder.replaceValues?.[value];
     if (func) {
       replaces[value] = func;
@@ -51,6 +50,17 @@ SchemaBuilder.prototype.replaceValue = async function (
       this.update(v);
     }
   });
+};
+
+SchemaBuilder.prototype.setAuthority = function (
+  func: (context: SchemaTypes["Context"]) => string[]
+) {
+  this.authorityFunc = func;
+};
+SchemaBuilder.prototype.getAuthority = function (
+  context: SchemaTypes["Context"]
+) {
+  return this.authorityFunc?.(context) ?? [];
 };
 
 export class PothosPrismaGeneratorPlugin<

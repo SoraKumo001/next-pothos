@@ -90,16 +90,18 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator pothos {
-  provider     = "prisma-pothos-types"
-  clientOutput = "@prisma/client"
-  output       = "../src/server/generated/pothos-types.ts"
-}
-
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Unnecessary because automatic generation does not refer to type information
+
+// generator pothos {
+//   provider     = "prisma-pothos-types"
+//   clientOutput = "@prisma/client"
+//   output       = "../src/server/generated/pothos-types.ts"
+// }
 
 /// @pothos-generator operation {include:["createOne","updateOne","findMany"]}
 /// @pothos-generator select {fields:{exclude:["email"]}}
@@ -118,6 +120,7 @@ model User {
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
 /// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}
 /// @pothos-generator input-data {data:{author:{connect:{id:"%%USER%%"}}}}
+/// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
 /// @pothos-generator where {include:["query"],where:{published:true}}
 /// @pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}
 /// @pothos-generator order {orderBy:{title:"desc"}}
@@ -152,7 +155,19 @@ builder に対して置換文字列を設定しておくと、input-data と whe
 ログインユーザの情報を書き込む場合などに利用できます。
 
 ```ts
-// 以下のディレクティブを置き換える
+// Replace the following directives
 // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
 builder.addReplaceValue("%%USER%%", async ({ context }) => context.user?.id);
+```
+
+### 権限によるクエリ条件の切り替え
+
+権限設定を行うと、where を切り替えられます。
+以下の場合、ログイン済みの場合は`where:{}`、ログインしていない場合は`,where:{published:true}`という条件が追加されます。
+
+```ts
+// Set the following permissions
+/// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
+/// @pothos-generator where {include:["query"],where:{published:true}}
+builder.setAuthority((ctx) => (ctx.user?.id ? ["authenticated"] : []));
 ```

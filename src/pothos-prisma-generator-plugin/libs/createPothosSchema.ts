@@ -53,9 +53,6 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                     const modelOrder = generator.getModelOrder(model.name)[
                       operationPrefix
                     ];
-                    const modelWhere = generator.getModelWhere(model.name)[
-                      operationPrefix
-                    ];
                     const options = generator.getModelOptions(field.type)[
                       operationPrefix
                     ];
@@ -64,10 +61,15 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                       args: field.isList
                         ? generator.findManyArgs(field.type)
                         : undefined,
-                      query: (args) => {
-                        if (!field.isList) return {};
-
+                      query: (args, ctx) => {
+                        const modelWhere = generator.getModelWhere(
+                          model.name,
+                          operationPrefix,
+                          ctx
+                        );
                         const where = { ...args.filter, ...modelOrder };
+                        if (!field.isList) return { where };
+
                         const orderBy = {
                           ...modelWhere,
                           ...args.orderBy,
@@ -115,9 +117,11 @@ export const createModelQuery = (
             },
             resolve: (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
-              const modelWhere = generator.getModelWhere(model.name)[
-                operationPrefix
-              ];
+              const modelWhere = generator.getModelWhere(
+                model.name,
+                operationPrefix,
+                ctx
+              );
               const where = { ...args.filter, ...modelWhere };
               return prisma[lowerFirst(model.name)].findUnique({
                 ...query,
@@ -153,9 +157,11 @@ export const createModelListQuery = (
               const modelOrder = generator.getModelOrder(model.name)[
                 operationPrefix
               ];
-              const modelWhere = generator.getModelWhere(model.name)[
-                operationPrefix
-              ];
+              const modelWhere = generator.getModelWhere(
+                model.name,
+                operationPrefix,
+                ctx
+              );
               const where = { ...args.filter, ...modelWhere };
               const orderBy = {
                 ...args.orderBy,
@@ -262,7 +268,6 @@ export const updateModelMutation = (
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map(({ name }) => {
-        const modelWhere = generator.getModelWhere(name)[operationPrefix];
         const options = generator.getModelOptions(name)[operationPrefix];
         return [
           `${operationPrefix}${name}`,
@@ -280,6 +285,11 @@ export const updateModelMutation = (
               }),
             },
             resolve: async (query, _root, args, ctx, _info) => {
+              const modelWhere = generator.getModelWhere(
+                name,
+                operationPrefix,
+                ctx
+              );
               const where = await t.builder.replaceValue(modelWhere, {
                 context: ctx,
               });
@@ -312,7 +322,6 @@ export const updateManyModelMutation = (
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map(({ name }) => {
-        const modelWhere = generator.getModelWhere(name)[operationPrefix];
         const options = generator.getModelOptions(name)[operationPrefix];
         return [
           `${operationPrefix}${name}`,
@@ -332,6 +341,11 @@ export const updateManyModelMutation = (
               }),
             },
             resolve: async (_parent, args, ctx, _info) => {
+              const modelWhere = generator.getModelWhere(
+                name,
+                operationPrefix,
+                ctx
+              );
               const where = await t.builder.replaceValue(modelWhere, {
                 context: ctx,
               });
@@ -360,7 +374,6 @@ export const deleteModelMutation = (
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
       .map((model) => {
-        const modelWhere = generator.getModelWhere(model.name)[operationPrefix];
         const options = generator.getModelOptions(model.name)[operationPrefix];
         return [
           `${operationPrefix}${model.name}`,
@@ -374,6 +387,11 @@ export const deleteModelMutation = (
               }),
             },
             resolve: async (query, _root, args, ctx, _info) => {
+              const modelWhere = generator.getModelWhere(
+                model.name,
+                operationPrefix,
+                ctx
+              );
               const where = await t.builder.replaceValue(modelWhere, {
                 context: ctx,
               });
@@ -401,7 +419,6 @@ export const deleteManyModelMutation = (
       )
       .map((model) => {
         const options = generator.getModelOptions(model.name)[operationPrefix];
-        const modelWhere = generator.getModelWhere(model.name)[operationPrefix];
         return [
           `${operationPrefix}${model.name}`,
           t.int({
@@ -413,6 +430,11 @@ export const deleteManyModelMutation = (
               }),
             },
             resolve: async (_parent, args, ctx, _info) => {
+              const modelWhere = generator.getModelWhere(
+                model.name,
+                operationPrefix,
+                ctx
+              );
               const where = await t.builder.replaceValue(modelWhere, {
                 context: ctx,
               });

@@ -1,7 +1,6 @@
 import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import { Context, prisma } from "./context";
-import PrismaTypes from "./generated/pothos-types";
 import { Prisma } from "@prisma/client";
 import { ByteResolver, DateTimeResolver, JSONResolver } from "graphql-scalars";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
@@ -15,7 +14,7 @@ import { serialize } from "cookie";
  */
 export const builder = new SchemaBuilder<{
   Context: Context;
-  PrismaTypes: PrismaTypes;
+  // PrismaTypes: PrismaTypes; //Not used because it is generated automatically
   Scalars: {
     DateTime: {
       Input: Date;
@@ -98,6 +97,10 @@ builder.mutationType({
   },
 });
 
-// 以下のディレクティブを置き換える
+// Replace the following directives
 // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
 builder.addReplaceValue("%%USER%%", async ({ context }) => context.user?.id);
+
+// Set the following permissions
+/// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
+builder.setAuthority((ctx) => (ctx.user?.id ? ["authenticated"] : []));

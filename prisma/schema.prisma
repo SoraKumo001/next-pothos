@@ -35,7 +35,7 @@ model User {
 /// @pothos-generator operation {exclude:["deleteMany"]}
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
 /// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}
-/// @pothos-generator input-data {data:{author:{connect:{id:"%%USER%%"}}}}
+/// @pothos-generator input-data {data:{authorId:"%%USER%%"}}
 /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
 /// @pothos-generator where {include:["query"],where:{published:true}}
 /// @pothos-generator where {include:["update","delete"],where:{authorId:"%%USER%%"}}

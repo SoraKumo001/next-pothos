@@ -1,30 +1,30 @@
 # pothos-generator
 
-鋭意、作りかけ
+## 概要
 
-## サンプルの実行方法
+Automatic generation of GraphQL schema from prisma schema
+
+## How to run the sample
 
 ```sh
-# dockerの起動
+# Start docker
 yarn dev:docker
-# DBのマイグレーション
+# DB migration
 yarn prisma:migrate
-# prismaのランタイム生成
+# prisma runtime generation
 yarn prisma:generate
-# seed作成
+# create seed
 yarn seed
-# Next.jsの起動
+# Start Next.js
 yarn dev
 ```
 
-## 概要
+### Builder Settings
 
-prisma の schema から GraphQL の schema を自動生成します
+Add PrismaPlugin,PrismaUtil,PothosPrismaGeneratorPlugin  
+ScopeAuthPlugin must also be added when using the authorization function.
 
-### Builder の設定
-
-PrismaPlugin,PrismaUtil,PothosPrismaGeneratorPlugin を追加します  
-認証機能を使用する際は ScopeAuthPlugin も追加する必要があります
+By setting `replace` and `authority` in pothosPrismaGenerator, you can refer to user information to separate the data to be inserted and the conditions to be applied.
 
 ```ts
 import SchemaBuilder from "@pothos/core";
@@ -42,13 +42,7 @@ import PothosPrismaGeneratorPlugin from "pothos-prisma-generator-plugin";
  */
 export const builder = new SchemaBuilder<{
   Context: Context;
-  PrismaTypes: PrismaTypes;
-  Scalars: {
-    DateTime: {
-      Input: Date;
-      Output: Date;
-    };
-  };
+  // PrismaTypes: PrismaTypes; //Not used because it is generated automatically
 }>({
   plugins: [
     PrismaPlugin,
@@ -63,24 +57,31 @@ export const builder = new SchemaBuilder<{
   authScopes: async (context) => ({
     authenticated: !!context.user,
   }),
-});
+  pothosPrismaGenerator: {
+    // Replace the following directives
+    // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
+    replace: { "%%USER%%": async ({ context }) => context.user?.id },
 
-// Add custom scalar types
-builder.addScalarType("DateTime", DateTimeResolver, {});
+    // Set the following permissions
+    /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
+    authority: async ({ context }) =>
+      context.user?.id ? ["authenticated"] : [],
+  },
+});
 ```
 
-### Prisma のスキーマ設定
+### Prisma schema settings
 
-`@pothos-generator`で出力内容を制御します。
-開発中で仕様が変更される可能性が大きいので詳細は省きます。
+The output content is controlled by `@pothos-generator`.
+Details are omitted since the specification is still under development and is likely to change.
 
-- query/mutation の自動出力設定  
+- Automatic output setting for query/mutation  
   `find`,`findMany`,`create`,`createMany`,`update`,`updateMany`,`delete`,`deleteMany`
-- query 時の`orderBy`,`where`の挿入
-- オプションの追加による、認証機能の設定
-- create や update 時に input 可能なフィールドの制限
-- create や update 時に強制入力する data の設定
-- create や update 時、prisma に送る where を context の情報を参照して実行時に生成する機能
+- Insertion of `orderBy` and `where` at query time
+- Configuration of authentication by adding options.
+- Restrict fields that can be input during create and update.
+- Set data to be forced during create and update
+- Function to generate `where' to prisma at runtime by referring to context information at create and update
 
 ```prisma
 // This is your Prisma schema file,
@@ -149,25 +150,24 @@ model Category {
 
 ```
 
-### 入力データの置換
+### Substitution of Input Data
 
-builder に対して置換文字列を設定しておくと、input-data と where ディレクティブ 内の文字列をクエリ実行時に置き換えます。
-ログインユーザの情報を書き込む場合などに利用できます。
+If a replacement string is set for builder, it will replace the strings in the input-data and where directives when the query is executed.
+This can be used, for example, to write logged-in user information.
 
 ```ts
 // Replace the following directives
 // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
-builder.addReplaceValue("%%USER%%", async ({ context }) => context.user?.id);
+replace: { "%%USER%%": async ({ context }) => context.user?.id },
 ```
 
-### 権限によるクエリ条件の切り替え
+### Switching query conditions by permissions
 
-権限設定を行うと、where を切り替えられます。
-以下の場合、ログイン済みの場合は`where:{}`、ログインしていない場合は`,where:{published:true}`という条件が追加されます。
+You can switch where by setting permissions.
+In the following case, the condition `where:{}` is added if you are logged in, and `,where:{published:true}` if you are not logged in.
 
 ```ts
 // Set the following permissions
 /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
-/// @pothos-generator where {include:["query"],where:{published:true}}
-builder.setAuthority((ctx) => (ctx.user?.id ? ["authenticated"] : []));
+authority: async ({ context }) => (context.user?.id ? ["authenticated"] : []),
 ```

@@ -2,7 +2,12 @@ import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import { Context, prisma } from "./context";
 import { Prisma } from "@prisma/client";
-import { ByteResolver, DateTimeResolver, JSONResolver } from "graphql-scalars";
+import {
+  BigIntResolver,
+  ByteResolver,
+  DateTimeResolver,
+  JSONResolver,
+} from "graphql-scalars";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
 import PothosPrismaGeneratorPlugin from "pothos-prisma-generator-plugin";
@@ -15,20 +20,6 @@ import { serialize } from "cookie";
 export const builder = new SchemaBuilder<{
   Context: Context;
   // PrismaTypes: PrismaTypes; //Not used because it is generated automatically
-  Scalars: {
-    DateTime: {
-      Input: Date;
-      Output: Date;
-    };
-    Json: {
-      Input: any;
-      Output: any;
-    };
-    Byte: {
-      Input: Buffer;
-      Output: Buffer;
-    };
-  };
 }>({
   plugins: [
     PrismaPlugin,
@@ -43,12 +34,17 @@ export const builder = new SchemaBuilder<{
   authScopes: async (context) => ({
     authenticated: !!context.user,
   }),
-});
+  pothosPrismaGenerator: {
+    // Replace the following directives
+    // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
+    replace: { "%%USER%%": async ({ context }) => context.user?.id },
 
-// Add custom scalar types
-builder.addScalarType("DateTime", DateTimeResolver, {});
-builder.addScalarType("Json", JSONResolver, {});
-builder.addScalarType("Byte", ByteResolver, {});
+    // Set the following permissions
+    /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
+    authority: async ({ context }) =>
+      context.user?.id ? ["authenticated"] : [],
+  },
+});
 
 // Example of how to add a custom auth query
 builder.mutationType({
@@ -96,11 +92,3 @@ builder.mutationType({
     };
   },
 });
-
-// Replace the following directives
-// /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
-builder.addReplaceValue("%%USER%%", async ({ context }) => context.user?.id);
-
-// Set the following permissions
-/// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
-builder.setAuthority((ctx) => (ctx.user?.id ? ["authenticated"] : []));

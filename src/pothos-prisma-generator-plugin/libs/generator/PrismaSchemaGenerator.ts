@@ -2,7 +2,7 @@ import { Prisma } from "@prisma/client";
 import type { SchemaTypes } from "@pothos/core";
 import { PrismaCrudGenerator } from "./PrismaCrudGenerator";
 import JSON5 from "json5";
-import { Optional } from "@prisma/client/runtime/library";
+import traverse from "traverse";
 
 const findOperations = ["findFirst", "findMany"] as const;
 const createOperations = ["createOne", "createMany"] as const;
@@ -28,33 +28,30 @@ const allOperations = [...findOperations, ...mutationOperations];
 type Operation = (typeof allOperations)[number];
 type ExtendOperation = Operation | "mutation" | "query";
 
+type FilterOperations = {
+  include?: Operation[];
+  exclude?: Operation[];
+};
+
 type ModelDirective = {
-  operation?: { include?: Operation[]; exclude?: Operation[] };
-  select?: {
-    include?: Operation[];
-    exclude?: Operation[];
+  operation?: FilterOperations;
+  select?: FilterOperations & {
     fields: { include?: string[]; exclude?: string[] };
   };
-  order?: {
-    include?: Operation[];
-    exclude?: Operation[];
+  order?: FilterOperations & {
     orderBy?: object;
   };
-  where?: {
-    include?: Operation[];
-    exclude?: Operation[];
+  where?: FilterOperations & {
     where?: object;
     authority?: string[];
   };
-  option?: { include?: Operation[]; exclude?: Operation[]; option?: object };
-  "input-field"?: {
-    include?: Operation[];
-    exclude?: Operation[];
+  option?: FilterOperations & {
+    option?: object;
+  };
+  "input-field"?: FilterOperations & {
     fields: { include?: string[]; exclude?: string[] };
   };
-  "input-data"?: {
-    include?: Operation[];
-    exclude?: Operation[];
+  "input-data"?: FilterOperations & {
     data?: object;
   };
 };
@@ -142,6 +139,15 @@ export class PrismaSchemaGenerator<
   modelInputWithoutFields: ModelInputWithoutFields = {};
   modelInputData: ModelInputData = {};
 
+  replaceValues?: {
+    [key: string]: (props: {
+      context: any;
+    }) => Promise<object | string | number | undefined>;
+  };
+  authorityFunc?: (props: {
+    context: SchemaTypes["Context"];
+  }) => Promise<string[]>;
+
   constructor(builder: PothosSchemaTypes.SchemaBuilder<Types>) {
     super(builder);
     this._builder = builder;
@@ -168,6 +174,56 @@ export class PrismaSchemaGenerator<
   }
   getBuilder() {
     return this._builder;
+  }
+
+  addReplaceValue(
+    search: string,
+    replaceFunction: (props: {
+      context: any;
+    }) => Promise<object | string | number | undefined>
+  ) {
+    if (!this.replaceValues) this.replaceValues = {};
+    this.replaceValues[search] = replaceFunction;
+  }
+  async replaceValue(target: object, props: { context: any }) {
+    const builder = this;
+    const replaces: {
+      [key: string]: (props: {
+        context: any;
+      }) => Promise<object | string | number | undefined>;
+    } = {};
+    const src = { ...target };
+    traverse(src).forEach(function (value) {
+      const func = builder.replaceValues?.[value];
+      if (func) {
+        replaces[value] = func;
+      }
+    });
+    const replaceValues = Object.fromEntries(
+      await Promise.all(
+        Object.entries(replaces).map(async ([key, func]) => [
+          key,
+          await func(props),
+        ])
+      )
+    );
+    return traverse(src).forEach(function (value) {
+      const v = replaceValues[value];
+      if (v) {
+        this.update(v);
+      }
+    });
+  }
+
+  setAuthority(
+    func: (props: { context: SchemaTypes["Context"] }) => Promise<string[]>
+  ) {
+    this.authorityFunc = func;
+  }
+  getAuthority(context: SchemaTypes["Context"]) {
+    return this.authorityFunc
+      ? this.authorityFunc({ context })
+      : Promise.resolve([]);
   }
 
   protected createModelOptions() {
@@ -339,14 +395,13 @@ export class PrismaSchemaGenerator<
     return this.modelSelections[modelName] ?? [];
   }
 
-  getModelWhere(
+  async getModelWhere(
     modelName: string,
     operationPrefix: Operation,
     ctx: SchemaTypes["Context"]
   ) {
     const values = this.modelWhere[modelName][operationPrefix];
-    const authority = this.getBuilder().getAuthority(ctx);
-    console.log(authority);
+    const authority = await this.getAuthority(ctx);
     const whereModel = values.find(
       (value) =>
         value[0].length === 0 || value[0].some((v) => authority.includes(v))

@@ -12,63 +12,35 @@ import {
   updateManyModelMutation,
   updateModelMutation,
 } from "./libs/createPothosSchema";
-import traverse from "traverse";
-
-SchemaBuilder.prototype.addReplaceValue = function (
-  search: string,
-  replaceFunction: (props: { context: any }) => object
-) {
-  if (!this.replaceValues) this.replaceValues = {};
-  this.replaceValues[search] = replaceFunction;
-};
-SchemaBuilder.prototype.replaceValue = async function (
-  target: object,
-  props: { context: any }
-) {
-  const builder = this;
-  const replaces: {
-    [key: string]: (props: { context: any }) => Promise<object>;
-  } = {};
-  const src = { ...target };
-  traverse(src).forEach(function (value) {
-    const func = builder.replaceValues?.[value];
-    if (func) {
-      replaces[value] = func;
-    }
-  });
-  const replaceValues = Object.fromEntries(
-    await Promise.all(
-      Object.entries(replaces).map(async ([key, func]) => [
-        key,
-        await func(props),
-      ])
-    )
-  );
-  return traverse(src).forEach(function (value) {
-    const v = replaceValues[value];
-    if (v) {
-      this.update(v);
-    }
-  });
-};
-
-SchemaBuilder.prototype.setAuthority = function (
-  func: (context: SchemaTypes["Context"]) => string[]
-) {
-  this.authorityFunc = func;
-};
-SchemaBuilder.prototype.getAuthority = function (
-  context: SchemaTypes["Context"]
-) {
-  return this.authorityFunc?.(context) ?? [];
-};
+import {
+  BigIntResolver,
+  ByteResolver,
+  DateTimeResolver,
+  JSONResolver,
+} from "graphql-scalars";
 
 export class PothosPrismaGeneratorPlugin<
   Types extends SchemaTypes
 > extends BasePlugin<Types> {
   beforeBuild(): void {
     const builder = this.builder;
+
+    // Add custom scalar types
+    if (builder.options.pothosPrismaGenerator?.autoScalers !== false) {
+      builder.addScalarType("BigInt" as never, BigIntResolver, {});
+      builder.addScalarType("Byte" as never, ByteResolver, {});
+      builder.addScalarType("DateTime" as never, DateTimeResolver, {});
+      builder.addScalarType("Json" as never, JSONResolver, {});
+    }
+
     const generator = new PrismaSchemaGenerator(builder);
+    const replace = builder.options.pothosPrismaGenerator?.replace;
+    replace &&
+      Object.entries(replace).forEach(([key, value]) => {
+        generator.addReplaceValue(key, value);
+      });
+    const authority = builder.options.pothosPrismaGenerator?.authority;
+    authority && generator.setAuthority(authority);
     createModelObject(generator);
 
     if (!builder.configStore.typeConfigs.has("Query")) {

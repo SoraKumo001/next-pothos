@@ -205,7 +205,7 @@ export const createModelMutation = (
             },
             resolve: async (query, _root, args, ctx, _info) => {
               const prisma = getPrisma(t, ctx);
-              const input = await t.builder.replaceValue(modelInput, {
+              const input = await generator.replaceValue(modelInput, {
                 context: ctx,
               });
               return prisma[lowerFirst(name)].create({
@@ -290,7 +290,7 @@ export const updateModelMutation = (
                 operationPrefix,
                 ctx
               );
-              const where = await t.builder.replaceValue(modelWhere, {
+              const where = await generator.replaceValue(modelWhere, {
                 context: ctx,
               });
               const prisma = getPrisma(t, ctx);
@@ -346,7 +346,7 @@ export const updateManyModelMutation = (
                 operationPrefix,
                 ctx
               );
-              const where = await t.builder.replaceValue(modelWhere, {
+              const where = await generator.replaceValue(modelWhere, {
                 context: ctx,
               });
               const prisma = getPrisma(t, ctx);
@@ -392,7 +392,7 @@ export const deleteModelMutation = (
                 operationPrefix,
                 ctx
               );
-              const where = await t.builder.replaceValue(modelWhere, {
+              const where = await generator.replaceValue(modelWhere, {
                 context: ctx,
               });
               const prisma = getPrisma(t, ctx);
@@ -435,7 +435,7 @@ export const deleteManyModelMutation = (
                 operationPrefix,
                 ctx
               );
-              const where = await t.builder.replaceValue(modelWhere, {
+              const where = await generator.replaceValue(modelWhere, {
                 context: ctx,
               });
               const prisma = getPrisma(t, ctx);

@@ -6,21 +6,25 @@ declare global {
     export interface Plugins<Types extends SchemaTypes> {
       pothosPrismaGenerator: PothosPrismaGeneratorPlugin<Types>;
     }
-    export interface SchemaBuilder<Types extends SchemaTypes> {
-      replaceValues?: { [key: string]: (props: { context: any }) => object };
-      authorityFunc?: (ctx: Types["Context"]) => string[];
-      addReplaceValue: (
-        search: string,
-        replaceFunction: (props: {
+
+    export interface SchemaBuilderOptions<Types extends SchemaTypes> {
+      pothosPrismaGenerator?: {
+        autoScalers?: boolean;
+        replace?: {
+          [key: string]: ({
+            context,
+          }: {
+            context: Types["Context"];
+          }) => Promise<object | string | number | undefined>;
+        };
+        authority: ({
+          context,
+        }: {
           context: Types["Context"];
-        }) => Promise<object | string | number | undefined>
-      ) => void;
-      replaceValue: (
-        target: object,
-        props: { context: any }
-      ) => Promise<object>;
-      setAuthority: (func: (ctx: Types["Context"]) => string[]) => void;
-      getAuthority: (ctx: Types["Context"]) => string[];
+        }) => Promise<string[]>;
+      };
     }
+
+    export interface SchemaBuilder<Types extends SchemaTypes> {}
   }
 }

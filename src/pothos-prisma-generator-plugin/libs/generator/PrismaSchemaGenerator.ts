@@ -1,8 +1,7 @@
-import { Prisma } from "@prisma/client";
-import type { SchemaTypes } from "@pothos/core";
-import { PrismaCrudGenerator } from "./PrismaCrudGenerator";
 import JSON5 from "json5";
 import traverse from "traverse";
+import { PrismaCrudGenerator } from "./PrismaCrudGenerator";
+import type { SchemaTypes } from "@pothos/core";
 
 const findOperations = ["findFirst", "findMany"] as const;
 const createOperations = ["createOne", "createMany"] as const;
@@ -143,7 +142,7 @@ export class PrismaSchemaGenerator<
 
   replaceValues?: {
     [key: string]: (props: {
-      context: any;
+      context: Types["Context"];
     }) => Promise<object | string | number | undefined>;
   };
   authorityFunc?: (props: {
@@ -154,7 +153,7 @@ export class PrismaSchemaGenerator<
     super(builder);
     this._builder = builder;
 
-    Prisma.dmmf.datamodel.models.map(({ name: modelName, documentation }) => {
+    this.getModels().map(({ name: modelName, documentation }) => {
       this.modelDirectives[modelName] = getSchemaDirectives(
         modelName,
         documentation
@@ -181,22 +180,21 @@ export class PrismaSchemaGenerator<
   addReplaceValue(
     search: string,
     replaceFunction: (props: {
-      context: any;
+      context: Types["Context"];
     }) => Promise<object | string | number | undefined>
   ) {
     if (!this.replaceValues) this.replaceValues = {};
     this.replaceValues[search] = replaceFunction;
   }
-  async replaceValue(target: object, props: { context: any }) {
-    const builder = this;
+  async replaceValue(target: object, props: { context: Types["Context"] }) {
     const replaces: {
       [key: string]: (props: {
-        context: any;
+        context: Types["Context"];
       }) => Promise<object | string | number | undefined>;
     } = {};
     const src = { ...target };
-    traverse(src).forEach(function (value) {
-      const func = builder.replaceValues?.[value];
+    traverse(src).forEach((value) => {
+      const func = this.replaceValues?.[value];
       if (func) {
         replaces[value] = func;
       }
@@ -227,9 +225,14 @@ export class PrismaSchemaGenerator<
       ? this.authorityFunc({ context })
       : Promise.resolve([]);
   }
+  getModels() {
+    const builder = this.getBuilder();
+    const { models } = this.getDMMF(builder);
+    return Object.entries(models).map(([name, value]) => ({ name, ...value }));
+  }
 
   protected createModelOptions() {
-    Prisma.dmmf.datamodel.models.forEach(({ name }) => {
+    this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "option");
       this.modelOptions[name] = directives.reduce(
         (pre, option) => {
@@ -249,7 +252,7 @@ export class PrismaSchemaGenerator<
   }
 
   protected createModelSelections() {
-    Prisma.dmmf.datamodel.models.forEach(({ name }) => {
+    this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "select");
       if (!directives.length) {
         const fields = this.getModelFields(name);
@@ -277,7 +280,7 @@ export class PrismaSchemaGenerator<
   }
 
   protected createModelOrder() {
-    Prisma.dmmf.datamodel.models.forEach(({ name }) => {
+    this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "order");
       this.modelOrder[name] = directives.reduce((pre, directive) => {
         const operations = getOperations(directive ?? {});
@@ -293,7 +296,7 @@ export class PrismaSchemaGenerator<
     });
   }
   protected createModelWhere() {
-    Prisma.dmmf.datamodel.models.forEach(({ name }) => {
+    this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "where");
       this.modelWhere[name] = directives.reduce((pre, directive) => {
         const operations = getOperations(directive ?? {});
@@ -310,7 +313,7 @@ export class PrismaSchemaGenerator<
   }
 
   protected createModelInputField() {
-    Prisma.dmmf.datamodel.models.forEach(({ name }) => {
+    this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "input-field");
       this.modelInputWithoutFields[name] = directives.reduce(
         (pre, directive) => {
@@ -332,7 +335,7 @@ export class PrismaSchemaGenerator<
     });
   }
   protected createModelInputData() {
-    Prisma.dmmf.datamodel.models.forEach(({ name }) => {
+    this.getModels().forEach(({ name }) => {
       const directives = this.getModelDirectives(name, "input-data");
       this.modelInputData[name] = directives.reduce((pre, directive) => {
         const operations = getOperations(directive ?? {});
@@ -352,9 +355,7 @@ export class PrismaSchemaGenerator<
     fields?: { include?: string[]; exclude?: string[] },
     inversion = false
   ) {
-    const model = Prisma.dmmf.datamodel.models.find(
-      ({ name }) => name === modelName
-    );
+    const model = this.getModels().find(({ name }) => name === modelName);
     const modelFields = model?.fields.map(({ name }) => name) ?? [];
     const include = fields?.include ?? modelFields;
     const exclude = fields?.exclude ?? [];

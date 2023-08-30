@@ -24,7 +24,5 @@ declare global {
         }) => Promise<string[]>;
       };
     }
-
-    export interface SchemaBuilder<Types extends SchemaTypes> {}
   }
 }

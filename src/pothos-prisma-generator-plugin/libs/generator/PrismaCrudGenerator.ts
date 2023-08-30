@@ -1,5 +1,4 @@
 import {
-  BaseEnum,
   EnumRef,
   InputObjectRef,
   InputType,
@@ -7,8 +6,9 @@ import {
   SchemaTypes,
 } from "@pothos/core";
 import { getModel, PrismaModelTypes } from "@pothos/plugin-prisma";
-import { FilterOps } from "@pothos/plugin-prisma-utils";
-import { Prisma } from "@prisma/client";
+import type { FilterOps } from "@pothos/plugin-prisma-utils";
+import type { PrismaClient } from "@prisma/client";
+import type { RuntimeDataModel } from "@prisma/client/runtime/library";
 
 const filterOps = ["equals", "in", "notIn", "not", "is", "isNot"] as const;
 const sortableFilterProps = ["lt", "lte", "gt", "gte"] as const;
@@ -483,13 +483,21 @@ export class PrismaCrudGenerator<Types extends SchemaTypes> {
     );
   }
 
+  getDMMF<Types extends SchemaTypes>(
+    builder: PothosSchemaTypes.SchemaBuilder<Types>
+  ): RuntimeDataModel {
+    const client = builder.options.prisma.client as PrismaClient & {
+      _runtimeDataModel: RuntimeDataModel;
+    };
+
+    return client._runtimeDataModel;
+  }
+
   getEnum(name: string) {
     if (!this.enumRefs.has(name)) {
-      const modelEnum = Prisma.dmmf.datamodel.enums.find(
-        (modelEnum) => modelEnum.name === name
-      );
+      const modelEnum = this.getDMMF(this.builder).enums[name];
       if (modelEnum) {
-        const enumRef = this.builder.enumType(modelEnum.name, {
+        const enumRef = this.builder.enumType(name, {
           values: modelEnum.values.map(({ name }) => name),
         });
         this.enumRefs.set(name, enumRef);

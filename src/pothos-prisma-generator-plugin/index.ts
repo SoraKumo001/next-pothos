@@ -1,6 +1,11 @@
 import SchemaBuilder, { BasePlugin, SchemaTypes } from "@pothos/core";
 import "./global-types";
-import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
+import {
+  BigIntResolver,
+  ByteResolver,
+  DateTimeResolver,
+  JSONResolver,
+} from "graphql-scalars";
 import {
   createModelListQuery,
   createModelMutation,
@@ -12,12 +17,7 @@ import {
   updateManyModelMutation,
   updateModelMutation,
 } from "./libs/createPothosSchema";
-import {
-  BigIntResolver,
-  ByteResolver,
-  DateTimeResolver,
-  JSONResolver,
-} from "graphql-scalars";
+import { PrismaSchemaGenerator } from "./libs/generator/PrismaSchemaGenerator";
 
 export class PothosPrismaGeneratorPlugin<
   Types extends SchemaTypes

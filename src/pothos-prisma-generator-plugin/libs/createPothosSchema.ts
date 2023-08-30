@@ -1,6 +1,11 @@
-import { Prisma } from "@prisma/client";
-import type { SchemaTypes } from "@pothos/core";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrismaSchemaGenerator } from "./generator/PrismaSchemaGenerator";
+import type {
+  InputFieldRef,
+  InputShapeFromFields,
+  SchemaTypes,
+} from "@pothos/core";
 
 type LowerFirst<T extends string> = T extends `${infer F}${infer R}`
   ? `${Lowercase<F>}${R}`
@@ -23,7 +28,7 @@ const getPrisma = <T extends SchemaTypes, ParentShape>(
 
 export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
   const builder = generator.getBuilder();
-  Prisma.dmmf.datamodel.models.map((model) => {
+  generator.getModels().map((model) => {
     const selectFields = new Set(
       generator.getModelSelect(model.name)["findFirst"]
     );
@@ -71,12 +76,12 @@ export const createModelObject = (generator: PrismaSchemaGenerator<any>) => {
                           authority,
                           ctx
                         );
-                        const where = { ...args.filter, ...modelOrder };
+                        const where = { ...args.filter, ...modelWhere };
                         if (!field.isList) return { where };
 
                         const orderBy = {
-                          ...modelWhere,
                           ...args.orderBy,
+                          ...modelOrder,
                         };
                         return {
                           where: Object.keys(where).length ? where : undefined,
@@ -101,7 +106,8 @@ export const createModelQuery = (
 ) => {
   const operationPrefix = "findFirst";
   return Object.fromEntries(
-    Prisma.dmmf.datamodel.models
+    generator
+      .getModels()
       .filter((model) =>
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
@@ -146,7 +152,8 @@ export const createModelListQuery = (
 ) => {
   const operationPrefix = "findMany";
   return Object.fromEntries(
-    Prisma.dmmf.datamodel.models
+    generator
+      .getModels()
       .filter((model) =>
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
@@ -158,7 +165,16 @@ export const createModelListQuery = (
             ...options,
             type: [model.name],
             args: generator.findManyArgs(model.name),
-            resolve: async (query, _root, args, ctx, _info) => {
+            resolve: async (
+              query,
+              _root,
+              args: InputShapeFromFields<{
+                filter: InputFieldRef<any, "Arg">;
+                orderBy: InputFieldRef<any, "Arg">;
+              }>,
+              ctx,
+              _info
+            ) => {
               const prisma = getPrisma(t, ctx);
               const modelOrder = await generator.getModelOrder(
                 model.name,
@@ -195,7 +211,8 @@ export const createModelMutation = (
 ) => {
   const operationPrefix = "createOne";
   return Object.fromEntries(
-    Prisma.dmmf.datamodel.models
+    generator
+      .getModels()
       .filter(({ name }) =>
         generator.getModelOperations(name).includes(operationPrefix)
       )
@@ -238,7 +255,8 @@ export const createManyModelMutation = (
 ) => {
   const operationPrefix = "createMany";
   return Object.fromEntries(
-    Prisma.dmmf.datamodel.models
+    generator
+      .getModels()
       .filter(({ name }) =>
         generator.getModelOperations(name).includes(operationPrefix)
       )
@@ -281,7 +299,8 @@ export const updateModelMutation = (
 ) => {
   const operationPrefix = "updateOne";
   return Object.fromEntries(
-    Prisma.dmmf.datamodel.models
+    generator
+      .getModels()
       .filter((model) =>
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
@@ -341,7 +360,8 @@ export const updateManyModelMutation = (
 ) => {
   const operationPrefix = "updateMany";
   return Object.fromEntries(
-    Prisma.dmmf.datamodel.models
+    generator
+      .getModels()
       .filter((model) =>
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
@@ -398,7 +418,8 @@ export const deleteModelMutation = (
 ) => {
   const operationPrefix = "deleteOne";
   return Object.fromEntries(
-    Prisma.dmmf.datamodel.models
+    generator
+      .getModels()
       .filter((model) =>
         generator.getModelOperations(model.name).includes(operationPrefix)
       )
@@ -441,7 +462,8 @@ export const deleteManyModelMutation = (
 ) => {
   const operationPrefix = "deleteMany";
   return Object.fromEntries(
-    Prisma.dmmf.datamodel.models
+    generator
+      .getModels()
       .filter((model) =>
         generator.getModelOperations(model.name).includes(operationPrefix)
       )

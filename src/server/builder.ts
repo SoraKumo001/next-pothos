@@ -2,12 +2,6 @@ import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import { Context, prisma } from "./context";
 import { Prisma } from "@prisma/client";
-import {
-  BigIntResolver,
-  ByteResolver,
-  DateTimeResolver,
-  JSONResolver,
-} from "graphql-scalars";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
 import PothosPrismaGeneratorPlugin from "pothos-prisma-generator-plugin";

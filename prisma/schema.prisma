@@ -18,7 +18,6 @@ datasource db {
 //   output       = "../src/server/generated/pothos-types.ts"
 // }
 
-
 /// @pothos-generator operation {include:["createOne","updateOne","findMany"]}
 /// @pothos-generator select {fields:{exclude:["email"]}}
 /// @pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}

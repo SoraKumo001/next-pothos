@@ -4,9 +4,11 @@ import { Context, prisma } from "./context";
 import { Prisma } from "@prisma/client";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
-import PothosPrismaGeneratorPlugin from "pothos-prisma-generator-plugin";
+import PothosPrismaGeneratorPlugin from "pothos-prisma-generator";
+import PothosSchemaExporter from "pothos-schema-exporter";
 import jsonwebtoken from "jsonwebtoken";
 import { serialize } from "cookie";
+import path from "path";
 
 /**
  * Create a new schema builder instance
@@ -20,6 +22,7 @@ export const builder = new SchemaBuilder<{
     PrismaUtils,
     ScopeAuthPlugin,
     PothosPrismaGeneratorPlugin,
+    PothosSchemaExporter,
   ],
   prisma: {
     client: prisma,
@@ -28,6 +31,11 @@ export const builder = new SchemaBuilder<{
   authScopes: async (context) => ({
     authenticated: !!context.user,
   }),
+  pothosSchemaExporter: {
+    output:
+      process.env.NODE_ENV === "development" &&
+      path.join(process.cwd(), "graphql", "schema.graphql"),
+  },
   pothosPrismaGenerator: {
     // Replace the following directives
     // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}

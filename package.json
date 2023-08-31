@@ -18,8 +18,6 @@
     "prisma:migrate": "prisma format && next-exec prisma migrate dev",
     "prisma:generate": "prisma generate",
     "graphql:codegen": "graphql-codegen --config codegen/codegen.ts",
-    "test": "jest --coverage",
-    "test:watch": "jest --watch --coverage",
     "seed": "ts-node  -r tsconfig-paths/register -T -O \"{\\\"module\\\":\\\"CommonJS\\\"}\" seed"
   },
   "dependencies": {

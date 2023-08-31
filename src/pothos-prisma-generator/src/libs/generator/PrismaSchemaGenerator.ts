@@ -392,7 +392,7 @@ export class PrismaSchemaGenerator<
     ctx: SchemaTypes["Context"]
   ) {
     const values = this.modelWhere[modelName][operationPrefix];
-    const whereModel = values.find(
+    const whereModel = values?.find(
       (value) =>
         value[0].length === 0 || value[0].some((v) => authority.includes(v))
     );
@@ -409,7 +409,7 @@ export class PrismaSchemaGenerator<
     authority: string[]
   ) {
     const values = this.modelOrder[modelName][operationPrefix];
-    const action = values.find(
+    const action = values?.find(
       (value) =>
         value[0].length === 0 || value[0].some((v) => authority.includes(v))
     );
@@ -426,7 +426,7 @@ export class PrismaSchemaGenerator<
   ) {
     const values = this.modelInputData[modelName][operationPrefix];
     const action =
-      values.find(
+      values?.find(
         (value) =>
           value[0].length === 0 || value[0].some((v) => authority.includes(v))
       )?.[1] ?? [];

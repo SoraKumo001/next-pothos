@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { NextApiRequest, NextApiResponse } from "next";
 
-declare var global: { prisma?: PrismaClient };
+declare let global: { prisma?: PrismaClient };
 
 export type Context = {
   res: NextApiResponse;

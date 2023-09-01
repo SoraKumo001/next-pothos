@@ -1,9 +1,10 @@
 import { ApolloServer } from "@apollo/server";
 import { executeHTTPGraphQLRequest } from "@react-libraries/next-apollo-server";
+import jsonwebtoken from "jsonwebtoken";
 import { Context, prisma } from "../../server/context";
 import type { NextApiHandler } from "next";
 import { schema } from "../../server";
-import jsonwebtoken from "jsonwebtoken";
+
 /**
  * apolloServer
  */

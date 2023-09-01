@@ -14,8 +14,7 @@
     "strict": true,
     "skipLibCheck": true,
     "paths": {
-      "pothos-prisma-generator": ["./src/pothos-prisma-generator/src"],
-      "pothos-schema-exporter": ["./src/pothos-schema-exporter/src"]
+      "pothos-prisma-generator": ["./src/pothos-prisma-generator/src"]
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

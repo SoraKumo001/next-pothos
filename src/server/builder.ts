@@ -3,7 +3,6 @@ import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
 import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
-import { Prisma } from "@prisma/client";
 import PothosPrismaGeneratorPlugin from "pothos-prisma-generator";
 import PothosSchemaExporter from "pothos-schema-exporter";
 import { Context, prisma } from "./context";
@@ -24,7 +23,6 @@ export const builder = new SchemaBuilder<{
   ],
   prisma: {
     client: prisma,
-    dmmf: Prisma.dmmf,
   },
   authScopes: async (context) => ({
     authenticated: !!context.user,

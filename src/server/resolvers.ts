@@ -1,6 +1,6 @@
-import { builder } from "./builder";
 import { serialize } from "cookie";
 import jsonwebtoken from "jsonwebtoken";
+import { builder } from "./builder";
 // Example of how to add a custom auth query
 builder.mutationType({
   fields: (t) => {

@@ -1663,10 +1663,10 @@
   dependencies:
     "@prisma/generator-helper" "^5.0.0"
 
-"@pothos/plugin-prisma@^3.58.0":
-  version "3.58.0"
-  resolved "https://registry.yarnpkg.com/@pothos/plugin-prisma/-/plugin-prisma-3.58.0.tgz#8d4073fbe0eacbb785911c65bed89b91c34fd3a8"
-  integrity sha512-XiXL6V3yzUiI8AGmnADh03NaFuv25nAYU3EC2Nj6SubH6RaaGtMiFKHr1Ze4t1J/PzBaB7MA0bDgMzdGf9oddA==
+"@pothos/plugin-prisma@^3.59.0":
+  version "3.59.0"
+  resolved "https://registry.yarnpkg.com/@pothos/plugin-prisma/-/plugin-prisma-3.59.0.tgz#5f7e2bea74eaf074c2b1ae0a893b0e3fd374cf5a"
+  integrity sha512-6gyJXu8al7SN+GV3ZAJBJBNtXLGuvFQ+dOxV146NTk2sl3OcGJV/VO1RuLGX/N+MZMujh7Kq2/SIpkvSY8jkhQ==
   dependencies:
     "@prisma/generator-helper" "^5.0.0"
 
@@ -2103,10 +2103,15 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^20.5.7":
+"@types/node@*":
   version "20.5.7"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-20.5.7.tgz#4b8ecac87fbefbc92f431d09c30e176fc0a7c377"
   integrity sha512-dP7f3LdZIysZnmvP3ANJYTSwg+wLLl8p7RqniVlV7j+oXSXAbt9h0WIBFmJy5inWZoX9wZN6eXx+YXd9Rh3RBA==
+
+"@types/node@^20.5.9":
+  version "20.5.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.5.9.tgz#a70ec9d8fa0180a314c3ede0e20ea56ff71aed9a"
+  integrity sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==
 
 "@types/normalize-package-data@^2.4.0":
   version "2.4.1"
@@ -6017,10 +6022,10 @@ postcss@8.4.14:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-pothos-prisma-generator@^0.0.1:
-  version "0.0.1"
-  resolved "https://registry.yarnpkg.com/pothos-prisma-generator/-/pothos-prisma-generator-0.0.1.tgz#ea4805d8aa7092b9e326bd2dd921e9b448289d67"
-  integrity sha512-c/nwl9CEkj95NMW3z+RYWvHvsoMc95fsSqe3SQreU7HWrKzUsJyP77VBL9gQ7RctryfrfT7Vn2FjPsgEmmY6WQ==
+pothos-prisma-generator@^0.0.4:
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/pothos-prisma-generator/-/pothos-prisma-generator-0.0.4.tgz#389d3cdcabacc4744ffd1bbc8846c450f4d69f7d"
+  integrity sha512-Dfus7CYuYGmZpjq/dFsp5rRxy/Bi9k0CncjKn9d5IxnOtGiKSDFCauNoCu7cIHGag7qtZxq7XGdf9XDhdCFV5Q==
   dependencies:
     graphql-scalars "^1.22.2"
     json5 "^2.2.3"

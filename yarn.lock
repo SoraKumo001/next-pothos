@@ -6017,6 +6017,15 @@ postcss@8.4.14:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
+pothos-prisma-generator@^0.0.1:
+  version "0.0.1"
+  resolved "https://registry.yarnpkg.com/pothos-prisma-generator/-/pothos-prisma-generator-0.0.1.tgz#ea4805d8aa7092b9e326bd2dd921e9b448289d67"
+  integrity sha512-c/nwl9CEkj95NMW3z+RYWvHvsoMc95fsSqe3SQreU7HWrKzUsJyP77VBL9gQ7RctryfrfT7Vn2FjPsgEmmY6WQ==
+  dependencies:
+    graphql-scalars "^1.22.2"
+    json5 "^2.2.3"
+    traverse "^0.6.7"
+
 pothos-schema-exporter@^0.0.4:
   version "0.0.4"
   resolved "https://registry.yarnpkg.com/pothos-schema-exporter/-/pothos-schema-exporter-0.0.4.tgz#99faa22790ad4d8b15ae0eb4d9660292c7bf1e05"

@@ -38,6 +38,7 @@
     "json5": "^2.2.3",
     "next": "^13.4.19",
     "next-exec": "^0.0.5",
+    "pothos-prisma-generator": "^0.0.1",
     "pothos-schema-exporter": "^0.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
@@ -92,6 +93,5 @@
       "./src/generated"
     ]
   },
-  "main": "index.js",
   "repository": "https://github.com/SoraKumo001/next-pothos"
 }

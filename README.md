@@ -1,8 +1,4 @@
-# pothos-generator
-
-## 概要
-
-Automatic generation of GraphQL schema from prisma schema
+# pothos-prisma-generator
 
 ## How to run the sample
 
@@ -19,7 +15,14 @@ yarn seed
 yarn dev
 ```
 
-### Builder Settings
+## Overview
+
+Automatic generation of GraphQL schema from prisma schema.
+generate `findFirst`,`findMany`,`createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany` for each model.
+
+The schema is generated internally at runtime, so no text output of the code is performed.
+
+## Builder Settings
 
 Add PrismaPlugin,PrismaUtil,PothosPrismaGeneratorPlugin  
 ScopeAuthPlugin must also be added when using the authorization function.
@@ -60,28 +63,98 @@ export const builder = new SchemaBuilder<{
   pothosPrismaGenerator: {
     // Replace the following directives
     // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
-    replace: { "%%USER%%": async ({ context }) => context.user?.id },
+    replace: { "%%USER%%": ({ context }) => context.user?.id },
 
     // Set the following permissions
     /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
-    authority: async ({ context }) =>
-      context.user?.id ? ["authenticated"] : [],
+    authority: ({ context }) => (context.user?.id ? ["authenticated"] : []),
   },
 });
 ```
 
-### Prisma schema settings
+### How to Write Directives
 
-The output content is controlled by `@pothos-generator`.
+```prisma
+/// @pothos-generator [Directive name] [Json5 format parameters]
+model ModelName {
+  …
+}
+```
+
+### Operation name
+
+- `find` or `query`  
+  `findFirst`,`findMany`
+- `create`  
+  `createOne`,`createMany`
+- `update`  
+  `updateOne`,`updateMany`
+- `delete`  
+  `deleteOne`,`deleteMany`
+- `mutation`  
+  `createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`
+
+### Select the operation to output
+
+`operation {include:[...OperationNames],exclude[...OperationNames]}`
+
+The default is all output.
+
+Example
+
+- Include `createOne` and `updateOne
+
+```prisma
+/// @pothos-generator operation {include:["createOne","updateOne"]}
+```
+
+- Exclude `deleteOne` and `deleteMany
+
+```prisma
+/// @pothos-generator operation {exclude:["delete"]}
+```
+
+### Sets options to be set for Pothos fields.
+
+`option {include:[...OperationNames],exclude[...OperationNames],option:{OptionName:Params,…}}`
+
+Example
+
+Set auth-plugin's `authScopes` for `createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`.
+
+```prisma
+/// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
+```
+
+### Select the fields to be set for the model type
+
+`select {fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
+
+### Set the fields that are allowed to be entered
+
+`input-field {include:[...OperationNames],exclude[...OperationNames],fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
+
+### Set the data to be interrupted in prisma data
+
+`input-data {include:[...OperationNames],exclude[...OperationNames],data:InputData,authority:[...Authorities]}`
+
+When authority is set, the first matching `input-data` directive is used.  
+The `replace` option of builder will replace the content.
+
+### Interrupts where to pass to prisma; if authority is set, the first match is used
+
+`where {include:[...OperationNames],exclude[...OperationNames],where:Where,authority:[...Authorities]}`
+
+The `replace` option of builder will replace the content.
+
+### Interrupts orderBy to pass to prisma; if authority is set, the first match is used
+
+`order {include:[...OperationNames],exclude[...OperationNames],orderBy:order,authority:[...Authorities]}`
+
+## Prisma schema settings
+
+The output content is controlled by `@pothos-generator`.  
 Details are omitted since the specification is still under development and is likely to change.
-
-- Automatic output setting for query/mutation  
-  `find`,`findMany`,`create`,`createMany`,`update`,`updateMany`,`delete`,`deleteMany`
-- Insertion of `orderBy` and `where` at query time
-- Configuration of authentication by adding options.
-- Restrict fields that can be input during create and update.
-- Set data to be forced during create and update
-- Function to generate `where' to prisma at runtime by referring to context information at create and update
 
 ```prisma
 // This is your Prisma schema file,
@@ -150,7 +223,7 @@ model Category {
 
 ```
 
-### Substitution of Input Data
+## Substitution of Input Data
 
 If a replacement string is set for builder, it will replace the strings in the input-data and where directives when the query is executed.
 This can be used, for example, to write logged-in user information.
@@ -161,7 +234,7 @@ This can be used, for example, to write logged-in user information.
 replace: { "%%USER%%": async ({ context }) => context.user?.id },
 ```
 
-### Switching query conditions by permissions
+## Switching query conditions by permissions
 
 You can switch where by setting permissions.
 In the following case, the condition `where:{}` is added if you are logged in, and `,where:{published:true}` if you are not logged in.

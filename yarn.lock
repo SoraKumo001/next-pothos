@@ -6022,19 +6022,19 @@ postcss@8.4.14:
     picocolors "^1.0.0"
     source-map-js "^1.0.2"
 
-pothos-prisma-generator@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/pothos-prisma-generator/-/pothos-prisma-generator-0.0.4.tgz#389d3cdcabacc4744ffd1bbc8846c450f4d69f7d"
-  integrity sha512-Dfus7CYuYGmZpjq/dFsp5rRxy/Bi9k0CncjKn9d5IxnOtGiKSDFCauNoCu7cIHGag7qtZxq7XGdf9XDhdCFV5Q==
+pothos-prisma-generator@^0.0.7:
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/pothos-prisma-generator/-/pothos-prisma-generator-0.0.7.tgz#1dbd528e1bc183e66dd643a33d6a5fd6bcd8b7b3"
+  integrity sha512-Sr3yRxmrWp8qVMNPu3TW7G/XLM8h1Ko87Ff2hRfeUqecGgv/rr97f5/FJp+iUqxYmCt4xHTpqx3xR1Iaa6M8Iw==
   dependencies:
     graphql-scalars "^1.22.2"
     json5 "^2.2.3"
     traverse "^0.6.7"
 
-pothos-schema-exporter@^0.0.4:
-  version "0.0.4"
-  resolved "https://registry.yarnpkg.com/pothos-schema-exporter/-/pothos-schema-exporter-0.0.4.tgz#99faa22790ad4d8b15ae0eb4d9660292c7bf1e05"
-  integrity sha512-o3NWgdVQsyoqPZQyxdTtQnc79MVXL1YD5sOYO/9IIpghPq5bWSbrRSX/Y1l00SbYvX79yl4XGkrk4cNZyLmgUA==
+pothos-schema-exporter@^0.0.6:
+  version "0.0.6"
+  resolved "https://registry.yarnpkg.com/pothos-schema-exporter/-/pothos-schema-exporter-0.0.6.tgz#5450d25a59d999a3abdc277672ed854cb014864d"
+  integrity sha512-VqHKogCTuBmdJ+Db0+3KMC5ZDQ2t+6KzD4w0s0Bu5oTHQu3szcWU0jVvnsHePXyivn53gEONkG9StAe30n+zHQ==
 
 prelude-ls@^1.2.1:
   version "1.2.1"

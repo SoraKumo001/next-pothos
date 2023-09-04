@@ -1,7 +1,7 @@
 version: '3.7'
 services:
   postgres:
-    container_name: mdblog-postgres
+    container_name: next-pothos-postgres
     image: postgres:alpine
     environment:
       POSTGRES_DB: postgres

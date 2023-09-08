@@ -12,6 +12,7 @@ const createApolloServer = async () => {
   const apolloServer = new ApolloServer<Context>({
     schema,
     plugins: [ApolloServerPluginLandingPageLocalDefault()],
+    introspection: true,
   });
   apolloServer.start();
   return apolloServer;

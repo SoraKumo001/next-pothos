@@ -13,7 +13,7 @@
   "scripts": {
     "dev": "prisma generate && next",
     "dev:docker": "docker compose -p next-nexus -f docker/development/docker-compose.yml up -d",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "eslint --fix ./src",
     "lint:fix": "eslint --fix ./src",

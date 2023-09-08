@@ -1,16 +1,17 @@
 import { ApolloServer } from "@apollo/server";
+import { ApolloServerPluginLandingPageLocalDefault } from "@apollo/server/plugin/landingPage/default";
 import { executeHTTPGraphQLRequest } from "@react-libraries/next-apollo-server";
 import jsonwebtoken from "jsonwebtoken";
 import { schema } from "../../server";
 import { Context, prisma } from "../../server/context";
 import type { NextApiHandler } from "next";
-
 /**
  * apolloServer
  */
 const createApolloServer = async () => {
   const apolloServer = new ApolloServer<Context>({
     schema,
+    plugins: [ApolloServerPluginLandingPageLocalDefault()],
   });
   apolloServer.start();
   return apolloServer;

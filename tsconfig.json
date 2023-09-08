@@ -12,10 +12,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "strict": true,
-    "skipLibCheck": true,
-    "paths": {
-      "pothos-prisma-generator": ["./src/pothos-prisma-generator/src"]
-    }
+    "skipLibCheck": true
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
   "exclude": ["node_modules"]

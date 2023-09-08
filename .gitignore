@@ -4,3 +4,4 @@ tsconfig.tsbuildinfo
 coverage
 .vscode
 .log
+.env.local

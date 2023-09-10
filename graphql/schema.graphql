@@ -16,6 +16,11 @@ The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://
 """
 scalar Json
 
+enum Role {
+  ADMIN
+  USER
+}
+
 enum OrderBy {
   Asc
   Desc
@@ -64,6 +69,7 @@ input UserFilter {
   email: StringFilter
   name: StringFilter
   posts: PostListFilter
+  roles: RoleListFilter
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
 }
@@ -72,6 +78,14 @@ input PostListFilter {
   every: PostFilter
   some: PostFilter
   none: PostFilter
+}
+
+input RoleListFilter {
+  has: Role
+  hasSome: [Role!]
+  hasEvery: [Role!]
+  isEmpty: Boolean
+  equals: [Role!]
 }
 
 input DateTimeFilter {
@@ -119,6 +133,7 @@ input UserOrderBy {
   email: OrderBy
   name: OrderBy
   posts: PostOrderBy
+  roles: OrderBy
   createdAt: OrderBy
   updatedAt: OrderBy
 }
@@ -131,7 +146,7 @@ input CategoryOrderBy {
   updatedAt: OrderBy
 }
 
-input UserCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput {
+input UserCreateWithoutIdWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput {
   email: String!
   name: String
 }
@@ -166,7 +181,7 @@ input UserUniqueFilter {
   email: String
 }
 
-input UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput {
+input UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput {
   name: String
 }
 
@@ -232,9 +247,11 @@ input CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithout
 
 type User {
   id: ID!
+  email: String!
   name: String!
   posts(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
   postsCount(filter: UserFilter): Int!
+  roles: [Role!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -248,7 +265,6 @@ type Post {
   authorId: String
   categories(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
   categoriesCount(filter: PostFilter): Int!
-  createdAt: DateTime!
   updatedAt: DateTime!
   publishedAt: DateTime!
 }
@@ -265,12 +281,12 @@ type Category {
 type Mutation {
   signIn(email: String!): Boolean!
   signOut: Boolean!
-  createOneUser(input: UserCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput!): User!
+  createOneUser(input: UserCreateWithoutIdWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput!): User!
   createOnePost(input: PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!): Post!
   createOneCategory(input: CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput!): Category!
   createManyPost(input: [PostCreateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!]!): Int!
   createManyCategory(input: [CategoryCreateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput!]!): Int!
-  updateOneUser(where: UserUniqueFilter!, data: UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput!): User!
+  updateOneUser(where: UserUniqueFilter!, data: UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput!): User!
   updateOnePost(where: PostUniqueFilter!, data: PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!): Post!
   updateOneCategory(where: CategoryUniqueFilter!, data: CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput!): Category!
   updateManyPost(where: PostFilter!, data: PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!): Int!

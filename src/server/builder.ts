@@ -38,7 +38,7 @@ export const builder = new SchemaBuilder<{
     replace: { "%%USER%%": ({ context }) => context.user?.id },
 
     // Set the following permissions
-    /// @pothos-generator where {include:["query"],where:{},authority:["authenticated"]}
-    authority: ({ context }) => (context.user?.id ? ["authenticated"] : []),
+    /// @pothos-generator any {authority:["ROLE"]}
+    authority: ({ context }) => context.user?.roles ?? [],
   },
 });

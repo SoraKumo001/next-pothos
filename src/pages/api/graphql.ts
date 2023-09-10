@@ -31,19 +31,19 @@ const handler: NextApiHandler = async (req, res) => {
     context: async () => {
       const token = req.cookies.session;
       const user = token
-        ? await new Promise<{ id: string; name: string } | undefined>(
-            (resolve) => {
-              jsonwebtoken.verify(token, "test", (_, data) => {
-                resolve(
-                  typeof data === "object"
-                    ? (data?.payload?.user as
-                        | { id: string; name: string }
-                        | undefined)
-                    : undefined
-                );
-              });
-            }
-          )
+        ? await new Promise<
+            { id: string; name: string; roles: string[] } | undefined
+          >((resolve) => {
+            jsonwebtoken.verify(token, "test", (_, data) => {
+              resolve(
+                typeof data === "object"
+                  ? (data.payload?.user as
+                      | { name: string; id: string; roles: string[] }
+                      | undefined)
+                  : undefined
+              );
+            });
+          })
         : undefined;
       return { req, res, prisma, user };
     },

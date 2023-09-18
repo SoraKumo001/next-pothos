@@ -2,7 +2,6 @@ import path from "path";
 import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
-import ScopeAuthPlugin from "@pothos/plugin-scope-auth";
 import PothosPrismaGeneratorPlugin from "pothos-prisma-generator";
 import PothosSchemaExporter from "pothos-schema-exporter";
 import { Context, prisma } from "./context";
@@ -17,16 +16,12 @@ export const builder = new SchemaBuilder<{
   plugins: [
     PrismaPlugin,
     PrismaUtils,
-    ScopeAuthPlugin,
     PothosPrismaGeneratorPlugin,
     PothosSchemaExporter,
   ],
   prisma: {
     client: prisma,
   },
-  authScopes: async (context) => ({
-    authenticated: !!context.user,
-  }),
   pothosSchemaExporter: {
     output:
       process.env.NODE_ENV === "development" &&

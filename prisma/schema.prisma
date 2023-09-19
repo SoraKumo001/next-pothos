@@ -10,23 +10,18 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-/// @pothos-generator executable {include:["mutation"],authority:["USER"]}
-/// @pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}
-/// @pothos-generator input-field {include:["update"],fields:{include:["name"]}}
+/// @pothos-generator executable {include:["mutation"],authority:["ADMIN"]}
 model User {
   id        String   @id @default(uuid())
-  /// @pothos-generator readable ["ADMIN"]
   email     String   @unique
   name      String   @default("User")
   posts     Post[]
-  /// @pothos-generator readable ["ADMIN"]
   roles     Role[]   @default([USER])
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
 
 /// @pothos-generator executable {include:["mutation"],authority:["USER"]}
-/// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","author"]}}
 /// @pothos-generator input-data {data:{authorId:"%%USER%%"}}
 /// @pothos-generator where {include:["query"],where:{},authority:["USER"]}
 /// @pothos-generator where {include:["query"],where:{published:true}}
@@ -40,7 +35,6 @@ model Post {
   author      User?      @relation(fields: [authorId], references: [id])
   authorId    String?
   categories  Category[]
-  /// @pothos-generator readable []
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
   publishedAt DateTime   @default(now())
@@ -48,7 +42,6 @@ model Post {
 
 /// @pothos-generator executable {include:["mutation"],authority:["USER"]}
 /// @pothos-generator order {orderBy:{name:"asc"}}
-/// @pothos-generator input-field {fields:{exclude:["id","createdAt","updatedAt","posts"]}}
 model Category {
   id        String   @id @default(uuid())
   name      String

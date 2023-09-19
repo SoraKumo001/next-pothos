@@ -165,15 +165,28 @@ input CategoryUniqueFilter {
 }
 
 input UserCreateInput {
+  id: String
   email: String!
   name: String
+  posts: UserCreatePostsRelationInput
+  roles: [Role!]
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input UserCreatePostsRelationInput {
+  create: [PostCreateInput!]
+  connect: [PostUniqueFilter!]
 }
 
 input PostCreateInput {
+  id: String
   published: Boolean
   title: String
   content: String
   categories: PostCreateCategoriesRelationInput
+  createdAt: DateTime
+  updatedAt: DateTime
   publishedAt: DateTime
 }
 
@@ -183,18 +196,41 @@ input PostCreateCategoriesRelationInput {
 }
 
 input CategoryCreateInput {
+  id: String
   name: String!
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
-input UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput {
+input UserUpdateInput {
+  id: String
+  email: String
   name: String
+  posts: UserUpdatePostsRelationInput
+  roles: [Role!]
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
-input PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput {
+input UserUpdatePostsRelationInput {
+  create: [PostCreateInput!]
+  set: [PostUniqueFilter!]
+  disconnect: [PostUniqueFilter!]
+  delete: [PostUniqueFilter!]
+  connect: [PostUniqueFilter!]
+  update: [UserUpdatePostsRelationInputUpdate!]
+  updateMany: [UserUpdatePostsRelationInputUpdateMany!]
+  deleteMany: [PostWithoutAuthorFilter!]
+}
+
+input PostUpdateWithoutAuthorInput {
+  id: String
   published: Boolean
   title: String
   content: String
   categories: PostUpdateCategoriesRelationInput
+  createdAt: DateTime
+  updatedAt: DateTime
   publishedAt: DateTime
 }
 
@@ -209,8 +245,11 @@ input PostUpdateCategoriesRelationInput {
   deleteMany: [CategoryWithoutPostsFilter!]
 }
 
-input CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput {
+input CategoryUpdateWithoutPostsInput {
+  id: String
   name: String
+  createdAt: DateTime
+  updatedAt: DateTime
 }
 
 input CategoryWithoutPostsFilter {
@@ -222,32 +261,114 @@ input CategoryWithoutPostsFilter {
 
 input PostUpdateCategoriesRelationInputUpdate {
   where: CategoryUniqueFilter
-  data: CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput
+  data: CategoryUpdateWithoutPostsInput
 }
 
 input PostUpdateCategoriesRelationInputUpdateMany {
   where: CategoryWithoutPostsFilter
-  data: CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutPostsInput
+  data: CategoryUpdateWithoutPostsInput
 }
 
-input CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput {
-  name: String
+input PostWithoutAuthorFilter {
+  id: StringFilter
+  published: BooleanFilter
+  title: StringFilter
+  content: StringFilter
+  categories: CategoryListFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+  publishedAt: DateTimeFilter
 }
 
-input UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput {
-  name: String
+input UserUpdatePostsRelationInputUpdate {
+  where: PostUniqueFilter
+  data: PostUpdateWithoutAuthorInput
 }
 
-input PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput {
+input UserUpdatePostsRelationInputUpdateMany {
+  where: PostWithoutAuthorFilter
+  data: PostUpdateWithoutAuthorInput
+}
+
+input PostUpdateInput {
+  id: String
   published: Boolean
   title: String
   content: String
+  author: PostUpdateAuthorRelationInput
   categories: PostUpdateCategoriesRelationInput
+  createdAt: DateTime
+  updatedAt: DateTime
   publishedAt: DateTime
 }
 
-input CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput {
+input PostUpdateAuthorRelationInput {
+  create: UserCreateInput
+  update: UserUpdateWithoutPostsInput
+  connect: UserUniqueFilter
+  disconnect: Boolean
+  delete: Boolean
+}
+
+input UserUpdateWithoutPostsInput {
+  id: String
+  email: String
   name: String
+  roles: [Role!]
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input CategoryUpdateInput {
+  id: String
+  name: String
+  posts: CategoryUpdatePostsRelationInput
+  createdAt: DateTime
+  updatedAt: DateTime
+}
+
+input CategoryUpdatePostsRelationInput {
+  create: [PostCreateInput!]
+  set: [PostUniqueFilter!]
+  disconnect: [PostUniqueFilter!]
+  delete: [PostUniqueFilter!]
+  connect: [PostUniqueFilter!]
+  update: [CategoryUpdatePostsRelationInputUpdate!]
+  updateMany: [CategoryUpdatePostsRelationInputUpdateMany!]
+  deleteMany: [PostWithoutCategoriesFilter!]
+}
+
+input PostUpdateWithoutCategoriesInput {
+  id: String
+  published: Boolean
+  title: String
+  content: String
+  author: PostUpdateAuthorRelationInput
+  createdAt: DateTime
+  updatedAt: DateTime
+  publishedAt: DateTime
+}
+
+input PostWithoutCategoriesFilter {
+  id: StringFilter
+  published: BooleanFilter
+  title: StringFilter
+  content: StringFilter
+  author: UserFilter
+  authorId: StringFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+  publishedAt: DateTimeFilter
+}
+
+input CategoryUpdatePostsRelationInputUpdate {
+  where: PostUniqueFilter
+  data: PostUpdateWithoutCategoriesInput
+}
+
+input CategoryUpdatePostsRelationInputUpdateMany {
+  where: PostWithoutCategoriesFilter
+  data: PostUpdateWithoutCategoriesInput
 }
 
 type User {
@@ -270,6 +391,7 @@ type Post {
   authorId: String
   categories(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
   categoriesCount(filter: CategoryFilter): Int!
+  createdAt: DateTime!
   updatedAt: DateTime!
   publishedAt: DateTime!
 }
@@ -292,12 +414,12 @@ type Mutation {
   createManyUser(input: [UserCreateInput!]!): Int!
   createManyPost(input: [PostCreateInput!]!): Int!
   createManyCategory(input: [CategoryCreateInput!]!): Int!
-  updateOneUser(where: UserUniqueFilter!, data: UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput!): User!
-  updateOnePost(where: PostUniqueFilter!, data: PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!): Post!
-  updateOneCategory(where: CategoryUniqueFilter!, data: CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput!): Category!
-  updateManyUser(where: UserFilter!, data: UserUpdateWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutEmailWithoutPostsWithoutRolesWithoutCreatedAtWithoutUpdatedAtInput!): Int!
-  updateManyPost(where: PostFilter!, data: PostUpdateWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutAuthorWithoutCreatedAtWithoutUpdatedAtInput!): Int!
-  updateManyCategory(where: CategoryFilter!, data: CategoryUpdateWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtWithoutIdWithoutPostsWithoutCreatedAtWithoutUpdatedAtInput!): Int!
+  updateOneUser(where: UserUniqueFilter!, data: UserUpdateInput!): User!
+  updateOnePost(where: PostUniqueFilter!, data: PostUpdateInput!): Post!
+  updateOneCategory(where: CategoryUniqueFilter!, data: CategoryUpdateInput!): Category!
+  updateManyUser(where: UserFilter!, data: UserUpdateInput!): Int!
+  updateManyPost(where: PostFilter!, data: PostUpdateInput!): Int!
+  updateManyCategory(where: CategoryFilter!, data: CategoryUpdateInput!): Int!
   deleteOneUser(where: UserUniqueFilter!): User!
   deleteOnePost(where: PostUniqueFilter!): Post!
   deleteOneCategory(where: CategoryUniqueFilter!): Category!

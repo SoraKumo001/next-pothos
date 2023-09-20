@@ -1,4 +1,3 @@
-import { serialize } from "cookie";
 import jsonwebtoken from "jsonwebtoken";
 import { builder } from "./builder";
 // Example of how to add a custom auth query
@@ -14,33 +13,30 @@ builder.mutationType({
             where: { email },
           });
           const token = jsonwebtoken.sign({ payload: { user: user } }, "test");
-          const res = ctx.res;
-          res.setHeader(
-            "Set-Cookie",
-            serialize("session", token, {
-              path: "/",
-              maxAge: 60 * 60 * 24 * 7,
-            })
-          );
+          const { cookieStore } = ctx;
+          cookieStore.set({
+            name: "session",
+            value: token,
+            path: "/",
+            expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
+            domain: null,
+          });
+
           return true;
         },
       }),
       // Example of how to add a custom auth query
       // and will clear the session cookie
       signOut: t.boolean({
-        resolve: (_root, args, ctx, _info) => {
-          const token = jsonwebtoken.sign(
-            { payload: { user: args.user } },
-            "test"
-          );
-          const res = ctx.res;
-          res.setHeader(
-            "Set-Cookie",
-            serialize("session", token, {
-              maxAge: 0,
-              path: "/",
-            })
-          );
+        resolve: (_root, _args, ctx, _info) => {
+          const { cookieStore } = ctx;
+          cookieStore.set({
+            name: "session",
+            value: "",
+            path: "/",
+            expires: 0,
+            domain: null,
+          });
           return true;
         },
       }),

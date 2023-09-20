@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client";
-import { NextApiRequest, NextApiResponse } from "next";
+import { CookieStore } from "@whatwg-node/cookie-store";
 
 declare let global: { prisma?: PrismaClient };
 
 export type Context = {
-  res: NextApiResponse;
-  req: NextApiRequest;
+  cookieStore: CookieStore;
+  req: Request;
   prisma: PrismaClient;
   user?: { name: string; id: string; roles: string[] };
 };

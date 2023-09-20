@@ -20,14 +20,36 @@ yarn dev
 ## Overview
 
 Automatic generation of GraphQL schema from prisma schema.
-generate `findFirst`,`findMany`,`createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany` for each model.
+
+Generate a GraphQL schema from `prisma.schema` that can be queried as follows.
+
+[prisma.schema](https://github.com/node-libraries/pothos-prisma-generator/blob/master/test/prisma/schema.prisma) -> [queries.graphql](https://github.com/node-libraries/pothos-prisma-generator/blob/master/test/graphql/operations.graphql)
+
+![](https://raw.githubusercontent.com/node-libraries/pothos-prisma-generator/master/documents/screenshot01.png)
+
+- `count`
+- `findUnique`
+- `findFirst`
+- `findMany`
+- `createOne`
+- `createMany`
+- `updateOne`
+- `updateMany`
+- `deleteOne`
+- `deleteMany`
 
 The schema is generated internally at runtime, so no text output of the code is performed.
 
 ## Sample code
 
-- Next.js  
-  <https://github.com/SoraKumo001/next-pothos>
+- Next.js
+  - <https://github.com/SoraKumo001/next-pothos>
+  - Deployed on Vercel  
+    <https://next-pothos.vercel.app/>
+- NestJS
+  - <https://github.com/SoraKumo001/nest-pothos>
+  - Deployed on Render.com  
+    <https://nest-pothos.onrender.com>
 
 ## Builder Settings
 
@@ -35,6 +57,18 @@ Add PrismaPlugin,PrismaUtil,PothosPrismaGeneratorPlugin
 ScopeAuthPlugin must also be added when using the authorization function.
 
 By setting `replace` and `authority` in pothosPrismaGenerator, you can refer to user information to separate the data to be inserted and the conditions to be applied.
+
+The following settings are made by default. To disable, use `autoScalers: false`.
+
+```ts
+builder.addScalarType("BigInt" as never, BigIntResolver, {});
+builder.addScalarType("Bytes" as never, ByteResolver, {});
+builder.addScalarType("DateTime" as never, DateTimeResolver, {});
+builder.addScalarType("Json" as never, JSONResolver, {});
+builder.addScalarType("Decimal" as never, HexadecimalResolver, {});
+```
+
+- Here is an example of Builder settings
 
 ```ts
 import SchemaBuilder from "@pothos/core";
@@ -69,6 +103,9 @@ export const builder = new SchemaBuilder<{
     authenticated: !!context.user,
   }),
   pothosPrismaGenerator: {
+    // Disable `autoScalers
+    //autoScalers: false,
+
     // Replace the following directives
     // /// @pothos-generator input {data:{author:{connect:{id:"%%USER%%"}}}}
     replace: { "%%USER%%": ({ context }) => context.user?.id },
@@ -91,18 +128,20 @@ model ModelName {
 
 ### Operation name
 
-- `query`  
-  `findFirst`,`findMany`,`count`
-- `find`  
-  `findFirst`,`findMany`
-- `create`  
-  `createOne`,`createMany`
-- `update`  
-  `updateOne`,`updateMany`
-- `delete`  
-  `deleteOne`,`deleteMany`
-- `mutation`  
-  `createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`
+If no operation is specified on the directive, it is applied to all.
+
+- query  
+  `findUnique`, `findFirst`, `findMany`, `count`
+- find  
+  `findUnique`, `findFirst`,`findMany`
+- create  
+  `createOne`, `createMany`
+- update  
+  `updateOne`, `updateMany`
+- delete  
+  `deleteOne`, `deleteMany`
+- mutation  
+  `createOne`, `createMany`, `updateOne`, `updateMany`, `deleteOne`, `deleteMany`
 
 ### Select the operation to output
 
@@ -110,15 +149,15 @@ model ModelName {
 
 The default is all output.
 
-Example
-
-- Include `createOne` and `updateOne
+- Example1  
+  Include `createOne` and `updateOne
 
 ```prisma
 /// @pothos-generator operation {include:["createOne","updateOne"]}
 ```
 
-- Exclude `deleteOne` and `deleteMany
+- Example2  
+  Exclude `deleteOne` and `deleteMany
 
 ```prisma
 /// @pothos-generator operation {exclude:["delete"]}
@@ -128,48 +167,187 @@ Example
 
 #### Sets options to be set for Pothos fields.
 
-`option {include:[...OperationNames],exclude[...OperationNames],option:{OptionName:Params,…}}`
+- Operator **option**
 
-Example
+```js
+{
+  include:[...OperationNames],
+  exclude:[...OperationNames],
+  option:{OptionName:Params,…}
+}
+```
 
-Set auth-plugin's `authScopes` for `createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`.
+- Example  
+  Set auth-plugin's `authScopes` for `createOne`,`createMany`,`updateOne`,`updateMany`,`deleteOne`,`deleteMany`.
 
 ```prisma
 /// @pothos-generator option {include:["mutation"],option:{authScopes:{authenticated:true}}}
 ```
 
+---
+
 #### Set the fields that are allowed to be entered
 
-`input-field {include:[...OperationNames],exclude[...OperationNames],fields:{include:[...FieldNames],exclude:[...FieldNames]}}`
+- Operator **input-field**
+
+```js
+{
+  include:[...OperationNames],
+  exclude:[...OperationNames],
+  fields:{include:[...FieldNames],exclude:[...FieldNames]}
+}
+```
+
+- Example  
+  `create` allows `email` and `name` to be entered.
+
+```prisma
+/// @pothos-generator input-field {include:["create"],fields:{include:["email","name"]}}
+```
+
+---
 
 #### Set the data to be interrupted in prisma data
 
-`input-data {include:[...OperationNames],exclude[...OperationNames],data:InputData,authority:[...Authorities]}`
+- Operator **input-data**
+
+```js
+{
+  include:[...OperationNames],
+  exclude:[...OperationNames],
+  data:InputData,
+  authority:[...Authorities]
+}
+```
 
 When authority is set, the first matching `input-data` directive is used.  
 The `replace` option of builder will replace the content.
 
+- Example  
+  Replace `authorId` with `%%USER%%` when inserting data
+
+```prisma
+/// @pothos-generator input-data {data:{authorId:"%%USER%%"}}
+```
+
+---
+
 #### Interrupts where to pass to prisma; if authority is set, the first match is used
 
-`where {include:[...OperationNames],exclude[...OperationNames],where:Where,authority:[...Authorities]}`
+- Operator **where**
+
+```js
+{
+  include:[...OperationNames],
+  exclude:[...OperationNames],
+  where:Where,
+  authority:[...Authorities]}
+```
 
 The `replace` option of builder will replace the content.
 
+- Example  
+  No condition if you have USER permission, otherwise `published:true` will be added to the condition.
+
+```prisma
+/// @pothos-generator where {include:["query"],where:{},authority:["USER"]}
+/// @pothos-generator where {include:["query"],where:{published:true}}
+```
+
+---
+
 #### Interrupts orderBy to pass to prisma; if authority is set, the first match is used
 
-`order {include:[...OperationNames],exclude[...OperationNames],orderBy:order,authority:[...Authorities]}`
+- Operator **order**
+
+```js
+{
+  include:[...OperationNames],
+  exclude:[...OperationNames],
+  orderBy:order,
+  authority:[...Authorities]
+}
+```
+
+- Example  
+  Defaults to `order` in ascending order of `title`.
+
+```prisma
+/// @pothos-generator order {orderBy:{title:"asc"}}
+```
+
+---
 
 #### Authority to execute operations
 
-`executable {include:[...OperationNames],exclude[...OperationNames],authority:[...Authorities]}`
+- Operator **executable**
+
+```js
+{
+  include:[...OperationNames],
+  exclude:[...OperationNames],
+  authority:[...Authorities]
+}
+```
+
+- Example  
+  You can perform `mutation` only if you retain USER privileges.
+
+```prisma
+/// @pothos-generator executable {include:["mutation"],authority:["USER"]}
+```
+
+---
+
+#### limit on the number of events
+
+- Operator **limit**
+
+```js
+{
+  include:[...OperationNames],
+  exclude:[...OperationNames],
+  limit:LIMIT,
+  authority:[...Authorities]
+}
+```
+
+- Example  
+  Set the maximum number of acquisitions to 10
+
+```prisma
+/// @pothos-generator limit {limit:10}
+```
+
+---
 
 ### Field directive
 
 #### Field read permission
 
-`readable [...Authorities]`
+- Operator **readable**
+
+```js
+[...Authorities];
+```
 
 If Authorities is empty, it will be removed from the GraphQL Object and will not appear in the Query.
+
+- Example1  
+  It can only be retrieved if you have ADMIN permission. Otherwise, adding it to the query will raise an exception.
+
+```prisma
+ /// @pothos-generator readable ["ADMIN"]
+```
+
+- Example2  
+  No one has read permission, so the field is invisible.
+
+```prisma
+/// @pothos-generator readable []
+```
+
+---
 
 ## Prisma schema settings
 
@@ -247,7 +425,7 @@ enum Role {
 
 ## Substitution of Input Data
 
-If a replacement string is set for builder, it will replace the strings in the input-data and where directives when the query is executed.
+If a replacement string is set for builder, it will replace the strings in the input-data and where directives when the query is executed.  
 This can be used, for example, to write logged-in user information.
 
 ```ts
@@ -258,11 +436,13 @@ replace: { "%%USER%%": async ({ context }) => context.user?.id },
 
 ## Switching query conditions by permissions
 
-You can switch where by setting permissions.
+You can switch where by setting permissions.  
 In the following case, the condition `where:{}` is added if you are logged in, and `,where:{published:true}` if you are not logged in.
 
 ```ts
-    // Set the following permissions
-    /// @pothos-generator any {authority:["ROLE"]}
-    authority: ({ context }) => context.user?.roles ?? [], // Sample assumes ["ADMIN", "USER"] is set during authentication
+// Set the following permissions
+// /// @pothos-generator any {authority:["ROLE"]}
+
+// Sample assumes ["ADMIN", "USER"] is set during authentication
+authority: ({ context }) => context.user?.roles ?? [],
 ```

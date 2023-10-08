@@ -1,5 +1,6 @@
 import jsonwebtoken from "jsonwebtoken";
 import { builder } from "./builder";
+import { Context } from "./context";
 // Example of how to add a custom auth query
 builder.mutationType({
   fields: (t) => {
@@ -9,10 +10,12 @@ builder.mutationType({
       signIn: t.boolean({
         args: { email: t.arg({ type: "String", required: true }) },
         resolve: async (_root, { email }, ctx, _info) => {
-          const user = await ctx.prisma.user.findUniqueOrThrow({
+          const { id, name, roles } = await ctx.prisma.user.findUniqueOrThrow({
             where: { email },
           });
-          const token = jsonwebtoken.sign({ payload: { user: user } }, "test");
+          const secret = process.env.SECRET ?? "";
+          const user: Context["user"] = { id, name, roles };
+          const token = jsonwebtoken.sign({ payload: { user: user } }, secret);
           const { cookieStore } = ctx;
           cookieStore.set({
             name: "session",

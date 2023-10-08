@@ -1,10 +1,11 @@
 import { useCookies } from "@whatwg-node/server-plugin-cookies";
+import { printSchema } from "graphql";
 import { createYoga } from "graphql-yoga";
-import jsonwebtoken from "jsonwebtoken";
-import { Context, prisma } from "../libs/context";
-import { schema } from "../libs/schema";
+import { getJWT } from "../libs/getJWT";
+import { Context, prisma } from "../pothos/context";
+import { schema } from "../pothos/schema";
 
-const { handleRequest } = createYoga<Context>({
+const { handleRequest } = createYoga<{}, Context>({
   schema,
   fetchAPI: { Response },
   plugins: [useCookies()],
@@ -12,23 +13,11 @@ const { handleRequest } = createYoga<Context>({
     const { cookieStore } = req;
     if (!cookieStore) throw new Error("cookieStore is undefined");
     const token = (await cookieStore.get("session"))?.value;
-    const user = token
-      ? await new Promise<
-          { id: string; name: string; roles: string[] } | undefined
-        >((resolve) => {
-          jsonwebtoken.verify(token, "test", (_, data) => {
-            resolve(
-              typeof data === "object"
-                ? (data.payload?.user as
-                    | { name: string; id: string; roles: string[] }
-                    | undefined)
-                : undefined
-            );
-          });
-        })
-      : undefined;
+    const user = await getJWT<Pick<Context, "user">>(token).then(
+      (v) => v?.user
+    );
     return { req, prisma, user, cookieStore };
   },
 });
 
-export { handleRequest as GET, handleRequest as POST };
+export { handleRequest as POST };

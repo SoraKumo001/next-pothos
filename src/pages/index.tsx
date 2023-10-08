@@ -1,9 +1,29 @@
 import { ApolloExplorer } from "@apollo/explorer/react";
+import { SCHEMA_RESPONSE } from "@apollo/explorer/src/helpers/constants";
 import { printSchema } from "graphql";
+import { generate } from "graphql-auto-query";
 import { GetStaticProps, NextPage } from "next";
-import { schema } from "../app/libs/schema";
+import { useEffect } from "react";
+import { schema } from "../app/pothos/schema";
 
 const Page: NextPage<{ schema: string }> = ({ schema }) => {
+  // Set up auto-generated queries
+  useEffect(() => {
+    const onMessage = () => {
+      const iframe = document.querySelector("iframe");
+      iframe?.contentWindow?.postMessage(
+        {
+          name: "SetOperation",
+          variables: "",
+          operation: generate(schema),
+        },
+        "https://explorer.embed.apollographql.com"
+      );
+    };
+    addEventListener("load", onMessage);
+    return () => removeEventListener("load", onMessage);
+  }, []);
+
   return (
     <>
       <style>{`
@@ -20,7 +40,9 @@ const Page: NextPage<{ schema: string }> = ({ schema }) => {
         schema={schema}
         endpointUrl="/graphql"
         persistExplorerState={true}
-        includeCookies={true}
+        handleRequest={(url, option) =>
+          fetch(url, { ...option, credentials: "same-origin" })
+        }
       />
     </>
   );

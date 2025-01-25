@@ -1,13 +1,13 @@
 import { useCookies } from "@whatwg-node/server-plugin-cookies";
-import { printSchema } from "graphql";
 import { createYoga } from "graphql-yoga";
 import { getJWT } from "../libs/getJWT";
-import { Context, prisma } from "../pothos/context";
+import { type Context, prisma } from "../pothos/context";
 import { schema } from "../pothos/schema";
 
 const { handleRequest } = createYoga<{}, Context>({
   schema,
   fetchAPI: { Response },
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   plugins: [useCookies()],
   context: async ({ request: req }) => {
     const { cookieStore } = req;

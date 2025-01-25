@@ -5,3 +5,5 @@ coverage
 .vscode
 .log
 .env.local
+
+certificates

@@ -1,10 +1,11 @@
-import path from "path";
+import path from "node:path";
 import SchemaBuilder from "@pothos/core";
 import PrismaPlugin from "@pothos/plugin-prisma";
 import PrismaUtils from "@pothos/plugin-prisma-utils";
 import PothosPrismaGeneratorPlugin from "pothos-prisma-generator";
-import PothosSchemaExporter from "pothos-schema-exporter";
-import { Context, prisma } from "./context";
+import PothosQueryGeneratorPlugin from "pothos-query-generator";
+import PothosSchemaExporterPlugin from "pothos-schema-exporter";
+import { type Context, prisma } from "./context";
 
 /**
  * Create a new schema builder instance
@@ -17,7 +18,8 @@ export const builder = new SchemaBuilder<{
     PrismaPlugin,
     PrismaUtils,
     PothosPrismaGeneratorPlugin,
-    PothosSchemaExporter,
+    PothosSchemaExporterPlugin,
+    PothosQueryGeneratorPlugin,
   ],
   prisma: {
     client: prisma,
@@ -26,6 +28,11 @@ export const builder = new SchemaBuilder<{
     output:
       process.env.NODE_ENV === "development" &&
       path.join(process.cwd(), "graphql", "schema.graphql"),
+  },
+  pothosQueryGenerator: {
+    output:
+      process.env.NODE_ENV === "development" &&
+      path.join(process.cwd(), "graphql", "query.graphql"),
   },
   pothosPrismaGenerator: {
     // Replace the following directives

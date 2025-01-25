@@ -31,139 +31,6 @@ enum OrderBy {
   Desc
 }
 
-input PostFilter {
-  id: StringFilter
-  published: BooleanFilter
-  title: StringFilter
-  content: StringFilter
-  author: UserFilter
-  authorId: StringFilter
-  categories: CategoryListFilter
-  createdAt: DateTimeFilter
-  updatedAt: DateTimeFilter
-  publishedAt: DateTimeFilter
-}
-
-input StringFilter {
-  equals: String
-  in: [String!]
-  notIn: [String!]
-  not: StringFilter
-  is: String
-  isNot: String
-  contains: String
-  startsWith: String
-  endsWith: String
-  lt: String
-  lte: String
-  gt: String
-  gte: String
-}
-
-input BooleanFilter {
-  equals: Boolean
-  in: [Boolean!]
-  notIn: [Boolean!]
-  not: BooleanFilter
-  is: Boolean
-  isNot: Boolean
-}
-
-input UserFilter {
-  id: StringFilter
-  email: StringFilter
-  name: StringFilter
-  posts: PostListFilter
-  roles: RoleListFilter
-  createdAt: DateTimeFilter
-  updatedAt: DateTimeFilter
-}
-
-input PostListFilter {
-  every: PostFilter
-  some: PostFilter
-  none: PostFilter
-}
-
-input RoleListFilter {
-  has: Role
-  hasSome: [Role!]
-  hasEvery: [Role!]
-  isEmpty: Boolean
-  equals: [Role!]
-}
-
-input DateTimeFilter {
-  equals: DateTime
-  in: [DateTime!]
-  notIn: [DateTime!]
-  not: DateTimeFilter
-  is: DateTime
-  isNot: DateTime
-  lt: DateTime
-  lte: DateTime
-  gt: DateTime
-  gte: DateTime
-}
-
-input CategoryFilter {
-  id: StringFilter
-  name: StringFilter
-  posts: PostListFilter
-  createdAt: DateTimeFilter
-  updatedAt: DateTimeFilter
-}
-
-input CategoryListFilter {
-  every: CategoryFilter
-  some: CategoryFilter
-  none: CategoryFilter
-}
-
-input PostOrderBy {
-  id: OrderBy
-  published: OrderBy
-  title: OrderBy
-  content: OrderBy
-  author: UserOrderBy
-  authorId: OrderBy
-  categories: CategoryOrderBy
-  createdAt: OrderBy
-  updatedAt: OrderBy
-  publishedAt: OrderBy
-}
-
-input UserOrderBy {
-  id: OrderBy
-  email: OrderBy
-  name: OrderBy
-  posts: PostOrderBy
-  roles: OrderBy
-  createdAt: OrderBy
-  updatedAt: OrderBy
-}
-
-input CategoryOrderBy {
-  id: OrderBy
-  name: OrderBy
-  posts: PostOrderBy
-  createdAt: OrderBy
-  updatedAt: OrderBy
-}
-
-input UserUniqueFilter {
-  id: String
-  email: String
-}
-
-input PostUniqueFilter {
-  id: String
-}
-
-input CategoryUniqueFilter {
-  id: String
-}
-
 input UserCreateInput {
   id: String
   email: String!
@@ -200,6 +67,19 @@ input CategoryCreateInput {
   name: String!
   createdAt: DateTime
   updatedAt: DateTime
+}
+
+input CategoryUniqueFilter {
+  id: String
+}
+
+input PostUniqueFilter {
+  id: String
+}
+
+input UserUniqueFilter {
+  id: String
+  email: String
 }
 
 input UserUpdateInput {
@@ -259,6 +139,35 @@ input CategoryWithoutPostsFilter {
   updatedAt: DateTimeFilter
 }
 
+input StringFilter {
+  equals: String
+  in: [String!]
+  notIn: [String!]
+  not: StringFilter
+  is: String
+  isNot: String
+  contains: String
+  startsWith: String
+  endsWith: String
+  lt: String
+  lte: String
+  gt: String
+  gte: String
+}
+
+input DateTimeFilter {
+  equals: DateTime
+  in: [DateTime!]
+  notIn: [DateTime!]
+  not: DateTimeFilter
+  is: DateTime
+  isNot: DateTime
+  lt: DateTime
+  lte: DateTime
+  gt: DateTime
+  gte: DateTime
+}
+
 input PostUpdateCategoriesRelationInputUpdate {
   where: CategoryUniqueFilter
   data: CategoryUpdateWithoutPostsInput
@@ -278,6 +187,66 @@ input PostWithoutAuthorFilter {
   createdAt: DateTimeFilter
   updatedAt: DateTimeFilter
   publishedAt: DateTimeFilter
+}
+
+input BooleanFilter {
+  equals: Boolean
+  in: [Boolean!]
+  notIn: [Boolean!]
+  not: BooleanFilter
+  is: Boolean
+  isNot: Boolean
+}
+
+input CategoryFilter {
+  id: StringFilter
+  name: StringFilter
+  posts: PostListFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+}
+
+input PostFilter {
+  id: StringFilter
+  published: BooleanFilter
+  title: StringFilter
+  content: StringFilter
+  author: UserFilter
+  authorId: StringFilter
+  categories: CategoryListFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+  publishedAt: DateTimeFilter
+}
+
+input UserFilter {
+  id: StringFilter
+  email: StringFilter
+  name: StringFilter
+  posts: PostListFilter
+  roles: RoleListFilter
+  createdAt: DateTimeFilter
+  updatedAt: DateTimeFilter
+}
+
+input PostListFilter {
+  every: PostFilter
+  some: PostFilter
+  none: PostFilter
+}
+
+input RoleListFilter {
+  has: Role
+  hasSome: [Role!]
+  hasEvery: [Role!]
+  isEmpty: Boolean
+  equals: [Role!]
+}
+
+input CategoryListFilter {
+  every: CategoryFilter
+  some: CategoryFilter
+  none: CategoryFilter
 }
 
 input UserUpdatePostsRelationInputUpdate {
@@ -371,8 +340,39 @@ input CategoryUpdatePostsRelationInputUpdateMany {
   data: PostUpdateWithoutCategoriesInput
 }
 
+input PostOrderBy {
+  id: OrderBy
+  published: OrderBy
+  title: OrderBy
+  content: OrderBy
+  author: UserOrderBy
+  authorId: OrderBy
+  categories: CategoryOrderBy
+  createdAt: OrderBy
+  updatedAt: OrderBy
+  publishedAt: OrderBy
+}
+
+input UserOrderBy {
+  id: OrderBy
+  email: OrderBy
+  name: OrderBy
+  posts: PostOrderBy
+  roles: OrderBy
+  createdAt: OrderBy
+  updatedAt: OrderBy
+}
+
+input CategoryOrderBy {
+  id: OrderBy
+  name: OrderBy
+  posts: PostOrderBy
+  createdAt: OrderBy
+  updatedAt: OrderBy
+}
+
 type User {
-  id: ID!
+  id: ID
   email: String!
   name: String!
   posts(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
@@ -383,7 +383,7 @@ type User {
 }
 
 type Post {
-  id: ID!
+  id: ID
   published: Boolean!
   title: String!
   content: String!
@@ -397,7 +397,7 @@ type Post {
 }
 
 type Category {
-  id: ID!
+  id: ID
   name: String!
   posts(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
   postsCount(filter: PostFilter): Int!
@@ -406,39 +406,39 @@ type Category {
 }
 
 type Mutation {
-  signIn(email: String!): Boolean!
-  signOut: Boolean!
-  createOneUser(input: UserCreateInput!): User!
-  createOnePost(input: PostCreateInput!): Post!
-  createOneCategory(input: CategoryCreateInput!): Category!
-  createManyUser(input: [UserCreateInput!]!): Int!
-  createManyPost(input: [PostCreateInput!]!): Int!
-  createManyCategory(input: [CategoryCreateInput!]!): Int!
-  updateOneUser(where: UserUniqueFilter!, data: UserUpdateInput!): User!
-  updateOnePost(where: PostUniqueFilter!, data: PostUpdateInput!): Post!
-  updateOneCategory(where: CategoryUniqueFilter!, data: CategoryUpdateInput!): Category!
-  updateManyUser(where: UserFilter!, data: UserUpdateInput!): Int!
-  updateManyPost(where: PostFilter!, data: PostUpdateInput!): Int!
-  updateManyCategory(where: CategoryFilter!, data: CategoryUpdateInput!): Int!
-  deleteOneUser(where: UserUniqueFilter!): User!
-  deleteOnePost(where: PostUniqueFilter!): Post!
-  deleteOneCategory(where: CategoryUniqueFilter!): Category!
-  deleteManyUser(where: UserFilter!): Int!
-  deleteManyPost(where: PostFilter!): Int!
-  deleteManyCategory(where: CategoryFilter!): Int!
+  signIn(email: String!): Boolean
+  signOut: Boolean
+  createOneUser(input: UserCreateInput!): User
+  createOnePost(input: PostCreateInput!): Post
+  createOneCategory(input: CategoryCreateInput!): Category
+  createManyUser(input: [UserCreateInput!]!): Int
+  createManyPost(input: [PostCreateInput!]!): Int
+  createManyCategory(input: [CategoryCreateInput!]!): Int
+  updateOneUser(where: UserUniqueFilter!, data: UserUpdateInput!): User
+  updateOnePost(where: PostUniqueFilter!, data: PostUpdateInput!): Post
+  updateOneCategory(where: CategoryUniqueFilter!, data: CategoryUpdateInput!): Category
+  updateManyUser(where: UserFilter!, data: UserUpdateInput!): Int
+  updateManyPost(where: PostFilter!, data: PostUpdateInput!): Int
+  updateManyCategory(where: CategoryFilter!, data: CategoryUpdateInput!): Int
+  deleteOneUser(where: UserUniqueFilter!): User
+  deleteOnePost(where: PostUniqueFilter!): Post
+  deleteOneCategory(where: CategoryUniqueFilter!): Category
+  deleteManyUser(where: UserFilter!): Int
+  deleteManyPost(where: PostFilter!): Int
+  deleteManyCategory(where: CategoryFilter!): Int
 }
 
 type Query {
-  countUser(filter: UserFilter): Int!
-  countPost(filter: PostFilter): Int!
-  countCategory(filter: CategoryFilter): Int!
-  findUniqueUser(filter: UserUniqueFilter!): User!
-  findUniquePost(filter: PostUniqueFilter!): Post!
-  findUniqueCategory(filter: CategoryUniqueFilter!): Category!
+  countUser(filter: UserFilter): Int
+  countPost(filter: PostFilter): Int
+  countCategory(filter: CategoryFilter): Int
+  findUniqueUser(filter: UserUniqueFilter!): User
+  findUniquePost(filter: PostUniqueFilter!): Post
+  findUniqueCategory(filter: CategoryUniqueFilter!): Category
   findFirstUser(filter: UserFilter, orderBy: [UserOrderBy!]): User
   findFirstPost(filter: PostFilter, orderBy: [PostOrderBy!]): Post
   findFirstCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!]): Category
-  findManyUser(filter: UserFilter, orderBy: [UserOrderBy!], limit: Int, offset: Int): [User!]!
-  findManyPost(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]!
-  findManyCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]!
+  findManyUser(filter: UserFilter, orderBy: [UserOrderBy!], limit: Int, offset: Int): [User!]
+  findManyPost(filter: PostFilter, orderBy: [PostOrderBy!], limit: Int, offset: Int): [Post!]
+  findManyCategory(filter: CategoryFilter, orderBy: [CategoryOrderBy!], limit: Int, offset: Int): [Category!]
 }

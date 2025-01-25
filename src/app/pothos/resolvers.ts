@@ -9,7 +9,7 @@ builder.mutationType({
       // This query will return true if the user is authenticated
       signIn: t.boolean({
         args: { email: t.arg({ type: "String", required: true }) },
-        resolve: async (_root, { email }, ctx, _info) => {
+        resolve: async (_root, { email }, ctx) => {
           const { id, name, roles } = await ctx.prisma.user.findUniqueOrThrow({
             where: { email },
           });
@@ -31,7 +31,7 @@ builder.mutationType({
       // Example of how to add a custom auth query
       // and will clear the session cookie
       signOut: t.boolean({
-        resolve: (_root, _args, ctx, _info) => {
+        resolve: (_root, _args, ctx) => {
           const { cookieStore } = ctx;
           cookieStore.set({
             name: "session",

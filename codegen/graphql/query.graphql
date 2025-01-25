@@ -1,8 +1,0 @@
-query Users {
-  Users {
-    id
-    name
-    createdAt
-    updatedAt
-  }
-}

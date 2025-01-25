@@ -1,10 +1,10 @@
-import type { IncomingMessage } from 'http';
+import { headers } from "next/headers";
 
-export const getHost = (req?: Partial<IncomingMessage>) => {
-  const headers = req?.headers;
+export const getHost = async () => {
+  const h = await headers();
 
-  const host = headers?.['x-forwarded-host'] ?? headers?.['host'];
+  const host = h.get("x-forwarded-host") ?? h.get("host");
   if (!host) return undefined;
-  const proto = headers?.['x-forwarded-proto']?.toString().split(',')[0] ?? 'http';
-  return headers ? `${proto}://${host}` : undefined;
+  const proto = h.get("x-forwarded-proto")?.toString().split(",")[0] ?? "http";
+  return `${proto}://${host}`;
 };

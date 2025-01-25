@@ -8,12 +8,6 @@ importers:
 
   .:
     dependencies:
-      '@apollo/explorer':
-        specifier: ^3.7.0
-        version: 3.7.0(graphql@16.10.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(use-deep-compare-effect@1.8.1(react@19.0.0))
-      '@apollo/sandbox':
-        specifier: ^2.7.0
-        version: 2.7.0(graphql@16.10.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       '@envelop/graphql-jit':
         specifier: ^8.0.4
         version: 8.0.4(@envelop/core@5.0.3)(graphql@16.10.0)
@@ -68,9 +62,6 @@ importers:
       urql:
         specifier: ^4.2.1
         version: 4.2.1(@urql/core@5.1.0(graphql@16.10.0))(react@19.0.0)
-      use-deep-compare-effect:
-        specifier: ^1.8.1
-        version: 1.8.1(react@19.0.0)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3
@@ -143,31 +134,6 @@ packages:
   '@ampproject/remapping@2.3.0':
     resolution: {integrity: sha512-30iZtAPgz+LTIYoeivqYo853f02jBYSd5uGnGpkFV0M3xOt9aN73erkgYAmZU43x4VfqcnLxW9Kpg3R5LC4YYw==}
     engines: {node: '>=6.0.0'}
-
-  '@apollo/explorer@3.7.0':
-    resolution: {integrity: sha512-7Y6JuYSK2Or5bctRmG/hrccj5b7+gAj58XZBewRzvpIDS6NPoN67fcltOortstVkYyeIscR6bTca8oCsAMozgA==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-      use-deep-compare-effect: ^1.8.1
-    peerDependenciesMeta:
-      react:
-        optional: true
-      react-dom:
-        optional: true
-      use-deep-compare-effect:
-        optional: true
-
-  '@apollo/sandbox@2.7.0':
-    resolution: {integrity: sha512-17Xvdj0zSCFE1TPNRtfsZ7/dsgOoiFZ7rFdM+X9ca523PG+qQbZ1x2nvGvrHmb2UzPb66RvOVJC+oNC072c17Q==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0 || ^18.0.0
-      react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
-    peerDependenciesMeta:
-      react:
-        optional: true
-      react-dom:
-        optional: true
 
   '@ardatan/relay-compiler@12.0.0':
     resolution: {integrity: sha512-9anThAaj1dQr6IGmzBMcfzOQKTa5artjuPmw8NYK/fiGEMjADbSguBY2FMDykt+QhilR3wc9VA/3yVju7JHg7Q==}
@@ -1128,14 +1094,8 @@ packages:
   '@types/react@19.0.8':
     resolution: {integrity: sha512-9P/o1IGdfmQxrujGbIMDyYaaCykhLKc0NGCtYcECNUr9UAaDe4gwvV9bR6tvd5Br1SG0j+PBpbKr2UYY8CwqSw==}
 
-  '@types/whatwg-mimetype@3.0.2':
-    resolution: {integrity: sha512-c2AKvDT8ToxLIOUlN51gTiHXflsfIFisS4pO7pDPoKouJCESkhZnEy623gwP9laCy5lnLDAw1vAzu2vM2YLOrA==}
-
   '@types/ws@8.5.14':
     resolution: {integrity: sha512-bd/YFLW+URhBzMXurx7lWByOu+xzU9+kb3RboOteXYDfW+tr+JZa99OyNmPINEGB/ahzKrEuc8rcv4gnpJmxTw==}
-
-  '@types/zen-observable@0.8.3':
-    resolution: {integrity: sha512-fbF6oTd4sGGy0xjHPKAt+eS2CrxJ3+6gQ3FGcBoIJR2TLAyCkCyI8JqZNy+FeON0AhVgNJoUumVoZQjBFUqHkw==}
 
   '@typescript-eslint/eslint-plugin@8.21.0':
     resolution: {integrity: sha512-eTH+UOR4I7WbdQnG4Z48ebIA6Bgi7WO8HvFEneeYBxG8qCOYgTOFPSg6ek9ITIDvGjDQzWHcoWHCDO2biByNzA==}
@@ -1356,9 +1316,6 @@ packages:
     resolution: {integrity: sha512-9ywCsCvo1ojrw0b+XYk7aFvTH6D9064t0RIL1rtMf3nsa02Xw41MS7sZw216Im35xj/UY0PDBQsa1brUDDF1Ow==}
     peerDependencies:
       '@babel/core': ^7.0.0
-
-  backo2@1.0.2:
-    resolution: {integrity: sha512-zj6Z6M7Eq+PBZ7PQxl5NT665MvJdAkzp0f60nAJ+sLaSCBPMwVak5ZegFbgVCzFcCJTKFoMizvM5Ld7+JrRJHA==}
 
   balanced-match@1.0.2:
     resolution: {integrity: sha512-3oSeUO0TMV67hN1AmbXsK4yaqU7tjiHlbxRDZOpH0KW9+CeX4bRAaX0Anxt0tx2MrpRpWwQaPwIlISEJhYU5Pw==}
@@ -1600,10 +1557,6 @@ packages:
     resolution: {integrity: sha512-JeMq7fEshyepOWDfcfHK06N3MhyPhz++vtqWhMT5O9A3K42rdsEDpfdVqjaqaAhsw6a+ZqeDvQVtD0hFHQWrzg==}
     engines: {node: '>= 0.6.0'}
 
-  dequal@2.0.3:
-    resolution: {integrity: sha512-0je+qPKHEMohvfRTCEo3CrPG6cAzAYgmzKyxRiYSSDkS6eGJdyVJm7WaYA5ECaAD9wLB2T4EEeymA5aFVcYXCA==}
-    engines: {node: '>=6'}
-
   detect-indent@6.1.0:
     resolution: {integrity: sha512-reYkTUJAZb9gUuZ2RvVCNhVHdg62RHnJ7WJl8ftMi4diZ6NWlciOzQN88pUhSELEwflJht4oQDv0F0BMlwaYtA==}
     engines: {node: '>=8'}
@@ -1820,12 +1773,6 @@ packages:
   esutils@2.0.3:
     resolution: {integrity: sha512-kVscqXk4OCp68SZ0dkgEKVi6/8ij300KBWTJq32P/dYeWTSwK41WyTxalN1eRmA5Z9UU/LX9D7FWSmV9SAYx6g==}
     engines: {node: '>=0.10.0'}
-
-  eventemitter3@3.1.0:
-    resolution: {integrity: sha512-ivIvhpq/Y0uSjcHDcOIccjmYjGLcP09MFGE7ysAwkAvkXfpZlC985pH2/ui64DKazbTW/4kN3yqozUxlXzI6cA==}
-
-  eventemitter3@3.1.2:
-    resolution: {integrity: sha512-tvtQIeLVHjDkJYnzf2dgVMxfuSGJeM/7UCG17TT4EumTfNtF+0nebF/4zWOIkCreAbtNqhGEboB6BWrwqNaw4Q==}
 
   external-editor@3.1.0:
     resolution: {integrity: sha512-hMQ4CX1p1izmuLYyZqLMO/qGNw10wSv9QDCPfzXfyFrOaCSSoRfqE1Kf1s5an66J5JZC62NewG+mK49jOCtQew==}
@@ -2291,9 +2238,6 @@ packages:
     resolution: {integrity: sha512-muId7Zzn9ywDsyXgTIafTry2sV3nySZeUDe6YedVd1Hvuuep5AsIlqK+XefWpYTyJG5e503F2xIuT2lcU6rCSw==}
     peerDependencies:
       ws: '*'
-
-  iterall@1.3.0:
-    resolution: {integrity: sha512-QZ9qOMdF+QLHxy1QIpUHUU1D5pS2CG2P69LF6L6CPjPYA/XMOmKV3PZpawHoAjHNyB0swdVTRxdYT4tbBbxqwg==}
 
   iterator.prototype@1.1.5:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
@@ -3021,12 +2965,6 @@ packages:
       babel-plugin-macros:
         optional: true
 
-  subscriptions-transport-ws@0.11.0:
-    resolution: {integrity: sha512-8D4C6DIH5tGiAIpp5I0wD/xRlNiZAPGHygzCe7VzyzUoxHtawzjNAY9SUTXU05/EY2NMY9/9GF0ycizkXr1CWQ==}
-    deprecated: The `subscriptions-transport-ws` package is no longer maintained. We recommend you use `graphql-ws` instead. For help migrating Apollo software to `graphql-ws`, see https://www.apollographql.com/docs/apollo-server/data/subscriptions/#switching-from-subscriptions-transport-ws    For general help using `graphql-ws`, see https://github.com/enisdenjo/graphql-ws/blob/master/README.md
-    peerDependencies:
-      graphql: ^15.7.2 || ^16.0.0
-
   supports-color@7.2.0:
     resolution: {integrity: sha512-qpCAvRl9stuOHveKsn7HncJRvv501qIacKzQlO/+Lwxc9+0q2wLyv4Dfvt80/DPn2pqOBsJdDiogXGR9+OvwRw==}
     engines: {node: '>=8'}
@@ -3037,10 +2975,6 @@ packages:
 
   swap-case@2.0.2:
     resolution: {integrity: sha512-kc6S2YS/2yXbtkSMunBtKdah4VFETZ8Oh6ONSmSd9bRxhqTrtARUCBUiWXH3xVPpvR7tz2CSnkuXVE42EcGnMw==}
-
-  symbol-observable@1.2.0:
-    resolution: {integrity: sha512-e900nM8RRtGhlV36KGEU9k65K3mPb1WV70OdjfxlG2EAuM1noi/E/BaW/uMhL7bPEssK8QV57vN3esixjUvcXQ==}
-    engines: {node: '>=0.10.0'}
 
   sync-fetch@0.6.0-2:
     resolution: {integrity: sha512-c7AfkZ9udatCuAy9RSfiGPpeOKKUAUK5e1cXadLOGUjasdxqYqAK0jTNkM/FSEyJ3a5Ra27j/tw/PS0qLmaF/A==}
@@ -3200,12 +3134,6 @@ packages:
       '@urql/core': ^5.0.0
       react: '>= 16.8.0'
 
-  use-deep-compare-effect@1.8.1:
-    resolution: {integrity: sha512-kbeNVZ9Zkc0RFGpfMN3MNfaKNvcLNyxOAAd9O4CBZ+kCBXXscn9s/4I+8ytUER4RDpEYs5+O6Rs4PqiZ+rHr5Q==}
-    engines: {node: '>=10', npm: '>=6'}
-    peerDependencies:
-      react: '>=16.13'
-
   util-deprecate@1.0.2:
     resolution: {integrity: sha512-EPD5q1uXyFxJpCrLnCc1nHnq3gOa6DZBocAIiI2TaSCA7VCJ1UJDMagCzIkXNsUYfD1daK//LTEQ8xiIbrHtcw==}
 
@@ -3225,10 +3153,6 @@ packages:
 
   webidl-conversions@3.0.1:
     resolution: {integrity: sha512-2JAn3z8AR6rjK8Sm8orRC0h/bcl/DqL7tRPdGZ4I1CjdF+EaMLmYxBHyXuKL849eucPFhvBoxMsflfOb8kxaeQ==}
-
-  whatwg-mimetype@3.0.0:
-    resolution: {integrity: sha512-nt+N2dzIutVRxARx1nghPKGv1xHikU7HKdfafKkLNLindmPU/ch3U31NOCGGA/dmPcmb1VlofO0vnKAcsm0o/Q==}
-    engines: {node: '>=12'}
 
   whatwg-mimetype@4.0.0:
     resolution: {integrity: sha512-QaKxh0eNIi2mE9p2vEdzfagOKHCcj1pJ56EEHGQOVxp8r9/iszLUUV7v89x9O1p/T+NlTM5W7jW6+cz4Fq1YVg==}
@@ -3278,18 +3202,6 @@ packages:
 
   wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
-
-  ws@7.5.10:
-    resolution: {integrity: sha512-+dbF1tHwZpXcbOJdVOkzLDxZP1ailvSxM6ZweXTegylPny803bFhA+vqBYw4s31NSAk4S2Qz+AKXK9a4wkdjcQ==}
-    engines: {node: '>=8.3.0'}
-    peerDependencies:
-      bufferutil: ^4.0.1
-      utf-8-validate: ^5.0.2
-    peerDependenciesMeta:
-      bufferutil:
-        optional: true
-      utf-8-validate:
-        optional: true
 
   ws@8.18.0:
     resolution: {integrity: sha512-8VbfWfHLbbwu3+N6OKsOMpBdT4kXPDDB9cJk2bJ6mh9ucxdlnNvH1e+roYkKmN9Nxw2yjz7VzeO9oOz2zJ04Pw==}
@@ -3345,12 +3257,6 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zen-observable-ts@1.1.0:
-    resolution: {integrity: sha512-1h4zlLSqI2cRLPJUHJFL8bCWHhkpuXkF+dbGkRaWjgDIG26DmzyshUMrdV/rL3UnR+mhaX4fRq8LPouq0MYYIA==}
-
-  zen-observable@0.8.15:
-    resolution: {integrity: sha512-PQ2PC7R9rslx84ndNBZB/Dkv8V8fZEpk83RLgXtYd0fwUgEjseMn1Dgajh2x6S8QbZAFa9p2qVCEuYZNgve0dQ==}
-
 snapshots:
 
   '@0no-co/graphql.web@1.0.13(graphql@16.10.0)':
@@ -3361,38 +3267,6 @@ snapshots:
     dependencies:
       '@jridgewell/gen-mapping': 0.3.8
       '@jridgewell/trace-mapping': 0.3.25
-
-  '@apollo/explorer@3.7.0(graphql@16.10.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)(use-deep-compare-effect@1.8.1(react@19.0.0))':
-    dependencies:
-      '@types/whatwg-mimetype': 3.0.2
-      graphql-ws: 5.16.2(graphql@16.10.0)
-      subscriptions-transport-ws: 0.11.0(graphql@16.10.0)
-      whatwg-mimetype: 3.0.0
-      zen-observable-ts: 1.1.0
-    optionalDependencies:
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
-      use-deep-compare-effect: 1.8.1(react@19.0.0)
-    transitivePeerDependencies:
-      - bufferutil
-      - graphql
-      - utf-8-validate
-
-  '@apollo/sandbox@2.7.0(graphql@16.10.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0)':
-    dependencies:
-      '@types/whatwg-mimetype': 3.0.2
-      eventemitter3: 3.1.0
-      graphql-ws: 5.16.2(graphql@16.10.0)
-      subscriptions-transport-ws: 0.11.0(graphql@16.10.0)
-      whatwg-mimetype: 3.0.0
-      zen-observable-ts: 1.1.0
-    optionalDependencies:
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
-    transitivePeerDependencies:
-      - bufferutil
-      - graphql
-      - utf-8-validate
 
   '@ardatan/relay-compiler@12.0.0(graphql@16.10.0)':
     dependencies:
@@ -4638,13 +4512,9 @@ snapshots:
     dependencies:
       csstype: 3.1.3
 
-  '@types/whatwg-mimetype@3.0.2': {}
-
   '@types/ws@8.5.14':
     dependencies:
       '@types/node': 22.10.10
-
-  '@types/zen-observable@0.8.3': {}
 
   '@typescript-eslint/eslint-plugin@8.21.0(@typescript-eslint/parser@8.21.0(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3))(eslint@9.19.0(jiti@2.4.2))(typescript@5.7.3)':
     dependencies:
@@ -4947,8 +4817,6 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  backo2@1.0.2: {}
-
   balanced-match@1.0.2: {}
 
   base64-js@1.5.1: {}
@@ -5225,8 +5093,6 @@ snapshots:
       object-keys: 1.1.1
 
   dependency-graph@0.11.0: {}
-
-  dequal@2.0.3: {}
 
   detect-indent@6.1.0: {}
 
@@ -5579,10 +5445,6 @@ snapshots:
   estraverse@5.3.0: {}
 
   esutils@2.0.3: {}
-
-  eventemitter3@3.1.0: {}
-
-  eventemitter3@3.1.2: {}
 
   external-editor@3.1.0:
     dependencies:
@@ -6118,8 +5980,6 @@ snapshots:
   isomorphic-ws@5.0.0(ws@8.18.0):
     dependencies:
       ws: 8.18.0
-
-  iterall@1.3.0: {}
 
   iterator.prototype@1.1.5:
     dependencies:
@@ -6917,18 +6777,6 @@ snapshots:
     optionalDependencies:
       '@babel/core': 7.26.7
 
-  subscriptions-transport-ws@0.11.0(graphql@16.10.0):
-    dependencies:
-      backo2: 1.0.2
-      eventemitter3: 3.1.2
-      graphql: 16.10.0
-      iterall: 1.3.0
-      symbol-observable: 1.2.0
-      ws: 7.5.10
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-
   supports-color@7.2.0:
     dependencies:
       has-flag: 4.0.0
@@ -6938,8 +6786,6 @@ snapshots:
   swap-case@2.0.2:
     dependencies:
       tslib: 2.8.1
-
-  symbol-observable@1.2.0: {}
 
   sync-fetch@0.6.0-2:
     dependencies:
@@ -7123,12 +6969,6 @@ snapshots:
       react: 19.0.0
       wonka: 6.3.4
 
-  use-deep-compare-effect@1.8.1(react@19.0.0):
-    dependencies:
-      '@babel/runtime': 7.26.7
-      dequal: 2.0.3
-      react: 19.0.0
-
   util-deprecate@1.0.2: {}
 
   v8-compile-cache-lib@3.0.1: {}
@@ -7142,8 +6982,6 @@ snapshots:
   web-streams-polyfill@3.3.3: {}
 
   webidl-conversions@3.0.1: {}
-
-  whatwg-mimetype@3.0.0: {}
 
   whatwg-mimetype@4.0.0: {}
 
@@ -7216,8 +7054,6 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  ws@7.5.10: {}
-
   ws@8.18.0: {}
 
   y18n@4.0.3: {}
@@ -7264,10 +7100,3 @@ snapshots:
   yn@3.1.1: {}
 
   yocto-queue@0.1.0: {}
-
-  zen-observable-ts@1.1.0:
-    dependencies:
-      '@types/zen-observable': 0.8.3
-      zen-observable: 0.8.15
-
-  zen-observable@0.8.15: {}

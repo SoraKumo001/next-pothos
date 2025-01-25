@@ -29,6 +29,9 @@ importers:
       '@types/react-dom':
         specifier: ^19.0.3
         version: 19.0.3(@types/react@19.0.8)
+      '@whatwg-node/cookie-store':
+        specifier: 0.2.2
+        version: 0.2.2
       '@whatwg-node/server-plugin-cookies':
         specifier: ^1.0.3
         version: 1.0.3(@whatwg-node/server@0.9.65)

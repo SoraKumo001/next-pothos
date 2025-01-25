@@ -4,7 +4,11 @@ import { getJWT } from "../libs/getJWT";
 import { type Context, prisma } from "../pothos/context";
 import { schema } from "../pothos/schema";
 
-const { handleRequest } = createYoga<{}, Context>({
+interface NextContext {
+  params: Promise<Record<string, string>>;
+}
+
+const { handleRequest } = createYoga<NextContext, Context>({
   schema,
   fetchAPI: { Response },
   // eslint-disable-next-line react-hooks/rules-of-hooks

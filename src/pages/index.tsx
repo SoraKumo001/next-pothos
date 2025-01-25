@@ -5,7 +5,7 @@ const Page = () => {
 
   return (
     <div>
-      {dataPost?.findManyPost.map((post) => (
+      {dataPost?.findManyPost?.map((post) => (
         <div key={post.id}>
           <div>{post.title}</div>
           <div>{post.content}</div>

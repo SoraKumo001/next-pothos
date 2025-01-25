@@ -52,7 +52,6 @@
     "@graphql-codegen/typescript": "^4.1.2",
     "@graphql-codegen/typescript-operations": "^4.4.0",
     "@graphql-codegen/typescript-urql": "^4.0.0",
-    "@types/cookie": "^1.0.0",
     "@types/jsonwebtoken": "^9.0.8",
     "@types/node": "^22.10.10",
     "@types/react": "^19.0.8",

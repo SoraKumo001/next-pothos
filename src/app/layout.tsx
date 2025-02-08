@@ -1,3 +1,4 @@
+import "./globals.css";
 import { UrqlProvider } from "@/components/Provider/UrqlProvider";
 import { getHost } from "@/libs/getHost";
 import { cookies } from "next/headers";

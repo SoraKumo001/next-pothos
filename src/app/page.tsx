@@ -8,8 +8,11 @@ const Page = () => {
   return (
     <div>
       <div>
-        <Link href="/explorer">Explorer</Link>
+        <Link className="text-blue-500 hover:underline" href="/explorer">
+          Apollo Explorer
+        </Link>
       </div>
+      <hr />
       {dataPost?.findManyPost?.map((post) => (
         <div key={post.id}>
           <div>{post.title}</div>

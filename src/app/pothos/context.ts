@@ -18,7 +18,7 @@ export const prisma =
     log: [
       {
         emit: "stdout",
-        level: "query",
+        level: "error",
       },
     ],
   });
